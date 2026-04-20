@@ -8,9 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Spelling Bee">
 <title>Concurso de Ortografía · Spanish Spelling Bee</title>
 <style>
-  /* ── Reset & Base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
   :root {
     --blue:    #1a56db;
     --blue-lt: #e8f0fe;
@@ -20,6 +18,8 @@
     --red-lt:  #fde8e8;
     --yellow:  #c27803;
     --yellow-lt:#fdf6b2;
+    --purple:  #6d28d9;
+    --purple-lt:#ede9fe;
     --gray-50: #f9fafb;
     --gray-100:#f3f4f6;
     --gray-200:#e5e7eb;
@@ -28,667 +28,213 @@
     --gray-700:#374151;
     --gray-900:#111827;
     --radius:  12px;
-    --shadow:  0 4px 24px rgba(0,0,0,.10);
     --font:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-
-  html, body {
-    height: 100%;
-    font-family: var(--font);
-    background: var(--gray-50);
-    color: var(--gray-900);
-    -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  html, body { height: 100%; font-family: var(--font); background: var(--gray-50); color: var(--gray-900); -webkit-text-size-adjust: 100%; }
+  body { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
 
   /* ── Header ── */
-  header {
-    background: #fff;
-    border-bottom: 1px solid var(--gray-200);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+  header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .logo-text { font-size: 15px; font-weight: 700; color: var(--gray-900); line-height: 1.2; }
+  .logo-sub { font-size: 11px; font-weight: 400; color: var(--gray-500); display: block; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .lang-toggle { display: flex; border: 1.5px solid var(--gray-300); border-radius: 8px; overflow: hidden; }
+  .lang-btn { padding: 6px 11px; font-size: 13px; font-weight: 500; background: #fff; border: none; cursor: pointer; color: var(--gray-700); -webkit-tap-highlight-color: transparent; transition: background .15s, color .15s; }
+  .lang-btn.active { background: var(--blue); color: #fff; }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  /* Review nav button */
+  .review-nav-btn { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--gray-300); background: #fff; font-size: 12px; font-weight: 600; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap; transition: all .15s; }
+  .review-nav-btn.has-words { border-color: var(--red); color: var(--red); background: var(--red-lt); }
+  .review-nav-btn .badge { background: var(--red); color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
 
-  .logo svg { flex-shrink: 0; }
+  /* ── Pages ── */
+  .page { display: none; flex: 1; flex-direction: column; }
+  .page.active { display: flex; }
 
-  .logo-text {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--gray-900);
-    line-height: 1.2;
-  }
-
-  .logo-sub {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--gray-500);
-    display: block;
-  }
-
-  /* Language toggle */
-  .lang-toggle {
-    display: flex;
-    border: 1.5px solid var(--gray-300);
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  .lang-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    background: #fff;
-    border: none;
-    cursor: pointer;
-    color: var(--gray-700);
-    -webkit-tap-highlight-color: transparent;
-    transition: background .15s, color .15s;
-  }
-
-  .lang-btn.active {
-    background: var(--blue);
-    color: #fff;
-  }
-
-  /* ── Main layout ── */
-  main {
-    flex: 1;
-    max-width: 680px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 16px 16px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  main { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 12px; }
 
   /* ── Cards ── */
-  .card {
-    background: #fff;
-    border-radius: var(--radius);
-    border: 1px solid var(--gray-200);
-    padding: 20px;
-  }
+  .card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; }
 
   /* ── Mode selector ── */
-  .mode-tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .mode-tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 8px;
-    border-radius: 8px;
-    border: 2px solid var(--gray-200);
-    background: #fff;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gray-700);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-  }
-
-  .mode-tab.active {
-    border-color: var(--blue);
-    background: var(--blue-lt);
-    color: var(--blue);
-  }
+  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mode-tab { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 8px; border-radius: 8px; border: 2px solid var(--gray-200); background: #fff; font-size: 14px; font-weight: 600; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
+  .mode-tab.active { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
 
   /* ── Stats bar ── */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    text-align: center;
-  }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+  .stat { background: var(--gray-100); border-radius: 8px; padding: 8px 4px; }
+  .stat-num { font-size: 22px; font-weight: 700; color: var(--gray-900); line-height: 1; }
+  .stat-lbl { font-size: 10px; color: var(--gray-500); margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
 
-  .stat {
-    background: var(--gray-100);
-    border-radius: 8px;
-    padding: 8px 4px;
-  }
+  /* ── Prompt area ── */
+  .prompt-area { text-align: center; }
+  .round-info { font-size: 12px; color: var(--gray-500); margin-bottom: 12px; font-weight: 500; }
+  .word-number { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; }
 
-  .stat-num {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gray-900);
-    line-height: 1;
-  }
-
-  .stat-lbl {
-    font-size: 10px;
-    color: var(--gray-500);
-    margin-top: 2px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
-
-  /* ── Word prompt area ── */
-  .prompt-area {
-    text-align: center;
-  }
-
-  .round-info {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-bottom: 12px;
-    font-weight: 500;
-  }
-
-  .word-number {
-    font-size: 13px;
-    color: var(--gray-500);
-    margin-bottom: 16px;
-  }
-
-  /* Big speak button */
-  .speak-btn-main {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    padding: 20px 32px;
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background .15s, transform .1s;
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
-    display: flex;
-  }
-
+  .speak-btn-main { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); padding: 20px 32px; font-size: 18px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .15s, transform .1s; width: 100%; max-width: 360px; margin: 0 auto; }
   .speak-btn-main:active { transform: scale(.97); }
   .speak-btn-main:disabled { background: var(--gray-300); cursor: default; }
+  .speak-btn-main.speaking { background: #1044b0; }
 
-  .speak-btn-main.speaking {
-    background: #1044b0;
-  }
-
-  .word-controls {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-
-  .ctrl-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1.5px solid var(--gray-300);
-    background: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-700);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-  }
-
+  .word-controls { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+  .ctrl-btn { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; border: 1.5px solid var(--gray-300); background: #fff; font-size: 13px; font-weight: 500; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
   .ctrl-btn:hover { border-color: var(--blue); color: var(--blue); }
   .ctrl-btn:active { transform: scale(.97); }
   .ctrl-btn:disabled { opacity: .4; cursor: default; }
 
-  /* ── Clue toggles (Practice Mode) ── */
-  .clue-section {
-    border-top: 1px solid var(--gray-100);
-    padding-top: 16px;
-    margin-top: 16px;
-  }
-
-  .clue-toggles {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-
-  .clue-toggle-btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1.5px solid var(--gray-300);
-    background: #fff;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--gray-700);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-  }
-
-  .clue-toggle-btn.active {
-    border-color: var(--blue);
-    background: var(--blue-lt);
-    color: var(--blue);
-  }
-
-  .clue-box {
-    background: var(--gray-50);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    color: var(--gray-700);
-    line-height: 1.5;
-    display: none;
-    border: 1px solid var(--gray-200);
-  }
-
-  .clue-box.visible { display: block; }
-
-  .first-letter-hint {
-    background: var(--yellow-lt);
-    border: 1px solid #fcd34d;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--yellow);
-    display: none;
-  }
-
+  /* ── Clue section ── */
+  .clue-section { border-top: 1px solid var(--gray-100); padding-top: 16px; margin-top: 16px; }
+  .clue-toggle-btn { padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--gray-300); background: #fff; font-size: 12px; font-weight: 500; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
+  .clue-toggle-btn.active { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
+  .first-letter-hint { background: var(--yellow-lt); border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--yellow); display: none; margin-top: 10px; }
   .first-letter-hint.visible { display: block; }
 
-  /* ── Answer input ── */
+  /* ── Answer section ── */
   .answer-section { display: flex; flex-direction: column; gap: 10px; }
-
-  .answer-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-  }
-
-  .answer-input {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 2px solid var(--gray-300);
-    font-size: 22px;
-    font-family: var(--font);
-    color: var(--gray-900);
-    outline: none;
-    transition: border-color .15s;
-    background: #fff;
-    -webkit-appearance: none;
-    appearance: none;
-    text-align: center;
-    letter-spacing: .5px;
-  }
-
+  .answer-label { font-size: 13px; font-weight: 600; color: var(--gray-700); }
+  .answer-input { width: 100%; padding: 14px 16px; border-radius: 10px; border: 2px solid var(--gray-300); font-size: 22px; font-family: var(--font); color: var(--gray-900); outline: none; transition: border-color .15s; background: #fff; -webkit-appearance: none; appearance: none; text-align: center; letter-spacing: .5px; }
   .answer-input:focus { border-color: var(--blue); }
   .answer-input.correct { border-color: var(--green); background: var(--green-lt); }
   .answer-input.wrong { border-color: var(--red); background: var(--red-lt); }
 
-  /* ── Spanish accent keypad ── */
-  .accent-keypad {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .accent-key {
-    min-width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    border: 1.5px solid var(--gray-300);
-    background: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--gray-700);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-    padding: 0 8px;
-  }
-
-  .accent-key:active {
-    background: var(--blue-lt);
-    border-color: var(--blue);
-    color: var(--blue);
-    transform: scale(.93);
-  }
+  /* ── Accent keypad ── */
+  .accent-keypad { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .accent-key { min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1.5px solid var(--gray-300); background: #fff; font-size: 18px; font-weight: 600; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; padding: 0 8px; }
+  .accent-key:active { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); transform: scale(.93); }
 
   /* ── Action buttons ── */
-  .action-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .btn-primary {
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: var(--blue);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background .15s, transform .1s;
-    grid-column: 1 / -1;
-  }
-
+  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-primary { padding: 14px; border-radius: 10px; border: none; background: var(--blue); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .15s, transform .1s; grid-column: 1 / -1; }
   .btn-primary:active { transform: scale(.98); }
   .btn-primary:disabled { background: var(--gray-300); cursor: default; }
-
-  .btn-secondary {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1.5px solid var(--gray-300);
-    background: #fff;
-    color: var(--gray-700);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-  }
-
+  .btn-secondary { padding: 12px; border-radius: 10px; border: 1.5px solid var(--gray-300); background: #fff; color: var(--gray-700); font-size: 14px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
   .btn-secondary:active { transform: scale(.97); }
-  .btn-secondary:disabled { opacity: .4; cursor: default; }
+  .btn-danger { padding: 12px; border-radius: 10px; border: 1.5px solid var(--red); background: #fff; color: var(--red); font-size: 14px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
 
-  .btn-danger {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1.5px solid var(--red);
-    background: #fff;
-    color: var(--red);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: all .15s;
-  }
-
-  /* ── Feedback banner ── */
-  .feedback {
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    display: none;
-    align-items: center;
-    gap: 10px;
-  }
-
+  /* ── Feedback ── */
+  .feedback { border-radius: 10px; padding: 14px 16px; font-size: 15px; font-weight: 600; display: none; align-items: center; gap: 10px; }
   .feedback.visible { display: flex; }
   .feedback.correct { background: var(--green-lt); color: var(--green); border: 1px solid #a7f3d0; }
   .feedback.wrong   { background: var(--red-lt);   color: var(--red);   border: 1px solid #fca5a5; }
   .feedback.near    { background: var(--yellow-lt); color: var(--yellow); border: 1px solid #fcd34d; }
-
   .feedback-icon { font-size: 22px; flex-shrink: 0; }
   .feedback-text { flex: 1; line-height: 1.4; }
   .feedback-word { font-size: 13px; font-weight: 400; margin-top: 2px; }
 
-  /* ── Streak & mastery ── */
-  .streak-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--gray-700);
-  }
-
-  .streak-dots {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-
-  .streak-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--gray-200);
-  }
-
+  /* ── Streak ── */
+  .streak-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); }
+  .streak-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .streak-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gray-200); }
   .streak-dot.hit  { background: var(--green); }
   .streak-dot.miss { background: var(--red); }
 
   /* ── Start screen ── */
-  #start-screen {
-    text-align: center;
-    padding: 32px 20px;
-  }
-
-  #start-screen h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: var(--gray-900);
-  }
-
-  #start-screen p {
-    font-size: 15px;
-    color: var(--gray-500);
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
-
-  .start-btn {
-    display: inline-block;
-    padding: 18px 40px;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background .15s, transform .1s;
-    width: 100%;
-    max-width: 340px;
-  }
-
+  #start-screen { text-align: center; padding: 32px 20px; }
+  #start-screen h2 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+  #start-screen p { font-size: 15px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.6; }
+  .start-btn { display: flex; align-items: center; justify-content: center; padding: 18px 40px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); font-size: 18px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .15s, transform .1s; width: 100%; max-width: 340px; margin: 0 auto; }
   .start-btn:active { transform: scale(.97); }
+  .word-count-badge { display: inline-block; margin-top: 16px; padding: 6px 14px; border-radius: 20px; background: var(--gray-100); font-size: 13px; color: var(--gray-500); }
 
-  .word-count-badge {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: var(--gray-100);
-    font-size: 13px;
-    color: var(--gray-500);
-  }
+  /* ── Session stats banner ── */
+  .session-banner { background: var(--blue-lt); border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--blue); display: none; }
+  .session-banner.visible { display: block; }
 
-  /* ── Parent focus list ── */
-  #focus-section {
-    display: none;
-  }
-
+  /* ── Focus list (in-session) ── */
+  #focus-section { display: none; }
   #focus-section.visible { display: block; }
+  .focus-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .focus-header h3 { font-size: 16px; font-weight: 700; }
+  .focus-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 160px; overflow-y: auto; }
+  .focus-word { padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; background: var(--red-lt); color: var(--red); border: 1px solid #fca5a5; }
+  .focus-word.near { background: var(--yellow-lt); color: var(--yellow); border-color: #fcd34d; }
+  .btn-download { padding: 8px 14px; border-radius: 8px; border: 1.5px solid var(--green); background: var(--green-lt); color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 6px; }
 
-  .focus-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+  /* ══════════════════════════════════════
+     REVIEW PAGE
+  ══════════════════════════════════════ */
+  .review-page-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 12px; }
 
-  .focus-header h3 {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--gray-900);
-  }
+  .review-hero { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; }
+  .review-hero h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .review-hero p { font-size: 13px; color: var(--gray-500); line-height: 1.5; margin-bottom: 16px; }
 
-  .focus-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 200px;
-    overflow-y: auto;
-  }
+  .review-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .review-stat { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px; text-align: center; }
+  .review-stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+  .review-stat-num.red { color: var(--red); }
+  .review-stat-num.yellow { color: var(--yellow); }
+  .review-stat-num.green { color: var(--green); }
+  .review-stat-lbl { font-size: 10px; color: var(--gray-500); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 
-  .focus-word {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    background: var(--red-lt);
-    color: var(--red);
-    border: 1px solid #fca5a5;
-  }
+  .review-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-review-dl { padding: 10px 16px; border-radius: 8px; border: 1.5px solid var(--green); background: var(--green-lt); color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 6px; }
+  .btn-clear-history { padding: 10px 16px; border-radius: 8px; border: 1.5px solid var(--gray-300); background: #fff; color: var(--gray-500); font-size: 13px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
-  .focus-word.near {
-    background: var(--yellow-lt);
-    color: var(--yellow);
-    border-color: #fcd34d;
-  }
+  /* Filter tabs */
+  .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-tab { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--gray-300); background: #fff; font-size: 13px; font-weight: 500; color: var(--gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .15s; }
+  .filter-tab.active { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
 
-  .btn-download {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1.5px solid var(--green);
-    background: var(--green-lt);
-    color: var(--green);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+  /* Word table */
+  .word-table-wrap { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; }
+  .word-table-header { display: grid; grid-template-columns: 1fr 52px 52px 52px 80px; gap: 0; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 10px 16px; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .5px; }
+  .word-row { display: grid; grid-template-columns: 1fr 52px 52px 52px 80px; gap: 0; padding: 11px 16px; border-bottom: 1px solid var(--gray-100); align-items: center; transition: background .1s; }
+  .word-row:last-child { border-bottom: none; }
+  .word-row:hover { background: var(--gray-50); }
+  .word-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .word-cell { font-size: 14px; font-weight: 600; text-align: center; }
+  .word-cell.wrong-num { color: var(--red); }
+  .word-cell.near-num { color: var(--yellow); }
+  .word-cell.correct-num { color: var(--green); }
 
-  /* ── Mastery badge ── */
-  .mastery-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
-
+  /* Mastery pill */
+  .mastery-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; }
   .mastery-0 { background: var(--gray-100); color: var(--gray-500); }
   .mastery-1 { background: #fef3c7; color: #92400e; }
   .mastery-2 { background: #d1fae5; color: #065f46; }
   .mastery-3 { background: #dbeafe; color: #1e40af; }
 
-  /* ── Session complete ── */
-  #session-end {
-    text-align: center;
-    padding: 24px;
-    display: none;
-  }
-
-  #session-end.visible { display: block; }
-
-  #session-end h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-  #session-end .score-big { font-size: 48px; font-weight: 800; color: var(--blue); }
-  #session-end p { font-size: 15px; color: var(--gray-500); margin: 8px 0 20px; }
-
-  /* ── Progress bar ── */
-  .progress-track {
-    height: 6px;
-    background: var(--gray-200);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--blue);
-    border-radius: 3px;
-    transition: width .3s ease;
-  }
+  /* empty state */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-500); }
+  .empty-state .big-emoji { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; line-height: 1.6; }
 
   /* ── Animations ── */
-  @keyframes pop {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.06); }
-    100% { transform: scale(1); }
-  }
-
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
   .pop { animation: pop .25s ease; }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%  { transform: translateX(-6px); }
-    40%  { transform: translateX(6px); }
-    60%  { transform: translateX(-4px); }
-    80%  { transform: translateX(4px); }
-  }
-
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
   .shake { animation: shake .35s ease; }
 
   /* ── Responsive ── */
-  @media (max-width: 400px) {
+  @media (max-width: 480px) {
     .stats-bar { grid-template-columns: repeat(2, 1fr); }
     .accent-key { min-width: 38px; height: 40px; font-size: 16px; }
     header { padding: 10px 12px; }
-    main { padding: 12px 12px 28px; }
+    main, .review-page-wrap { padding: 12px 12px 28px; }
+    .word-table-header, .word-row { grid-template-columns: 1fr 40px 40px 40px 64px; padding: 10px 12px; }
+    .word-name { font-size: 14px; }
+    .review-summary-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
-  /* Hidden utility */
   .hidden { display: none !important; }
 </style>
 </head>
-
 <body>
 
 <!-- ═══════════════ HEADER ═══════════════ -->
 <header>
   <div class="logo">
-    <!-- Bee SVG logo -->
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-label="Spelling Bee" xmlns="http://www.w3.org/2000/svg">
+    <svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-label="Spelling Bee" xmlns="http://www.w3.org/2000/svg">
       <circle cx="18" cy="18" r="18" fill="#1a56db"/>
-      <!-- Bee body -->
       <ellipse cx="18" cy="20" rx="7" ry="9" fill="#fbbf24"/>
       <rect x="12" y="17" width="12" height="3" rx="1.5" fill="#1a56db" opacity=".7"/>
       <rect x="12" y="21" width="12" height="3" rx="1.5" fill="#1a56db" opacity=".7"/>
-      <!-- Wings -->
       <ellipse cx="10" cy="13" rx="5" ry="3" fill="white" opacity=".85" transform="rotate(-20 10 13)"/>
       <ellipse cx="26" cy="13" rx="5" ry="3" fill="white" opacity=".85" transform="rotate(20 26 13)"/>
-      <!-- Head -->
       <circle cx="18" cy="11" r="4" fill="#fbbf24"/>
-      <!-- Eyes -->
       <circle cx="16.5" cy="10.5" r="1" fill="#111"/>
       <circle cx="19.5" cy="10.5" r="1" fill="#111"/>
     </svg>
@@ -697,23 +243,30 @@
       <span class="logo-sub" id="header-sub">Concurso de Ortografía</span>
     </div>
   </div>
-  <div class="lang-toggle">
-    <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" id="lang-es" onclick="setLang('es')">ES</button>
+  <div class="header-right">
+    <button class="review-nav-btn" id="review-nav-btn" onclick="showReviewPage()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      <span id="review-nav-lbl">Review</span>
+      <span class="badge hidden" id="review-badge">0</span>
+    </button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="lang-es" onclick="setLang('es')">ES</button>
+    </div>
   </div>
 </header>
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- ═══════════════ GAME PAGE ═══════════════ -->
+<div class="page active" id="page-game">
 <main>
 
-  <!-- ── START SCREEN ── -->
+  <!-- START SCREEN -->
   <div class="card" id="start-screen">
     <h2 id="start-title">¡Bienvenido al Spelling Bee!</h2>
-    <p id="start-desc">Escucha cada palabra, escríbela correctamente con los acentos, y avanza en el concurso. ¡Buena suerte!</p>
-    
+    <p id="start-desc">Escucha cada palabra, escríbela correctamente con los acentos, y avanza en el concurso.</p>
     <div class="mode-tabs" style="margin-bottom:20px;">
       <button class="mode-tab active" id="tab-practice" onclick="setMode('practice')">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5A9.62 9.62 0 0 0 3 6v13a9.618 9.618 0 0 1 4.5-1c1.747 0 3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1v13a9.621 9.621 0 0 0-4.5-1c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5A9.62 9.62 0 003 6v13a9.618 9.618 0 014.5-1c1.747 0 3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1v13a9.621 9.621 0 00-4.5-1c-1.746 0-3.332.477-4.5 1.253"/></svg>
         <span id="tab-practice-lbl">Práctica</span>
       </button>
       <button class="mode-tab" id="tab-bee" onclick="setMode('bee')">
@@ -721,41 +274,29 @@
         <span id="tab-bee-lbl">Concurso</span>
       </button>
     </div>
-    
-    <div id="practice-desc" style="font-size:13px;color:var(--gray-500);margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px;line-height:1.6;">
-      <span id="practice-desc-txt">Modo con ayudas: pista de primera letra, claves opcionales, y reintento. Perfecto para estudiar.</span>
+    <div id="practice-desc-box" style="font-size:13px;color:var(--gray-500);margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px;line-height:1.6;">
+      <span id="practice-desc-txt">Modo con ayudas: pista de primera letra y reintento.</span>
     </div>
-
-    <button class="start-btn" id="start-btn" onclick="startPractice()">
+    <!-- Saved session banner -->
+    <div class="session-banner" id="session-banner"></div>
+    <br id="banner-spacer" class="hidden">
+    <button class="start-btn" onclick="startPractice()">
       <span id="start-btn-lbl">🐝 Comenzar</span>
     </button>
     <div class="word-count-badge" id="word-count-badge">1,070 palabras · adaptivo</div>
   </div>
 
-  <!-- ── GAME AREA (hidden until started) ── -->
+  <!-- GAME AREA -->
   <div id="game-area" class="hidden">
 
-    <!-- Stats bar -->
-    <div class="card" style="padding: 12px 16px;">
+    <!-- Stats -->
+    <div class="card" style="padding:12px 16px;">
       <div class="stats-bar">
-        <div class="stat">
-          <div class="stat-num" id="stat-correct">0</div>
-          <div class="stat-lbl" id="stat-correct-lbl">Correctas</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num" id="stat-wrong">0</div>
-          <div class="stat-lbl" id="stat-wrong-lbl">Errores</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num" id="stat-streak">0</div>
-          <div class="stat-lbl" id="stat-streak-lbl">Racha</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num" id="stat-total">0</div>
-          <div class="stat-lbl" id="stat-total-lbl">Total</div>
-        </div>
+        <div class="stat"><div class="stat-num" id="stat-correct">0</div><div class="stat-lbl" id="stat-correct-lbl">Correctas</div></div>
+        <div class="stat"><div class="stat-num" id="stat-wrong">0</div><div class="stat-lbl" id="stat-wrong-lbl">Errores</div></div>
+        <div class="stat"><div class="stat-num" id="stat-streak">0</div><div class="stat-lbl" id="stat-streak-lbl">Racha</div></div>
+        <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl" id="stat-total-lbl">Total</div></div>
       </div>
-      <!-- Streak history dots -->
       <div class="streak-bar" style="margin-top:10px;justify-content:center;">
         <div class="streak-dots" id="streak-dots"></div>
       </div>
@@ -766,13 +307,10 @@
       <div class="prompt-area">
         <div class="round-info" id="round-mode-label">MODO PRÁCTICA</div>
         <div class="word-number" id="word-num-label">Palabra #1</div>
-        
-        <!-- Main speak button -->
         <button class="speak-btn-main" id="speak-btn" onclick="speakWord()">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 015.657 2.343M12 6v12M9 9l-6 3 6 3"/></svg>
           <span id="speak-btn-lbl">Escuchar palabra</span>
         </button>
-        
         <div class="word-controls">
           <button class="ctrl-btn" id="slow-btn" onclick="speakWordSlow()" disabled>
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -787,36 +325,22 @@
             <span id="next-btn-lbl">Siguiente</span>
           </button>
         </div>
-
-        <!-- Practice mode clues -->
         <div class="clue-section" id="clue-section">
-          <div class="clue-toggles" id="clue-toggles">
-            <button class="clue-toggle-btn" id="hint-first-btn" onclick="toggleFirstLetter()">
-              <span id="hint-first-lbl">Primera letra</span>
-            </button>
-          </div>
+          <button class="clue-toggle-btn" id="hint-first-btn" onclick="toggleFirstLetter()">
+            <span id="hint-first-lbl">Primera letra</span>
+          </button>
           <div class="first-letter-hint" id="first-letter-hint"></div>
         </div>
       </div>
     </div>
 
-    <!-- Answer area -->
+    <!-- Answer -->
     <div class="card">
       <div class="answer-section">
         <label class="answer-label" for="answer-input" id="answer-lbl">Escribe la palabra:</label>
-        <input 
-          type="text" 
-          id="answer-input" 
-          class="answer-input" 
-          placeholder="..." 
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          inputmode="text"
-        />
-        <!-- Spanish accent keypad -->
-        <div class="accent-keypad" id="accent-keypad">
+        <input type="text" id="answer-input" class="answer-input" placeholder="..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text"/>
+        <div class="accent-keypad">
           <button class="accent-key" onclick="insertChar('á')">á</button>
           <button class="accent-key" onclick="insertChar('é')">é</button>
           <button class="accent-key" onclick="insertChar('í')">í</button>
@@ -832,7 +356,6 @@
           <button class="accent-key" onclick="insertChar('Ü')">Ü</button>
           <button class="accent-key" onclick="insertChar('Ñ')">Ñ</button>
         </div>
-        <!-- Feedback -->
         <div class="feedback" id="feedback">
           <div class="feedback-icon" id="feedback-icon"></div>
           <div class="feedback-text">
@@ -840,22 +363,15 @@
             <div class="feedback-word" id="feedback-word"></div>
           </div>
         </div>
-        <!-- Action buttons -->
         <div class="action-row">
-          <button class="btn-primary" id="check-btn" onclick="checkAnswer()">
-            <span id="check-btn-lbl">✓ Verificar</span>
-          </button>
-          <button class="btn-secondary" id="menu-btn" onclick="returnToMenu()">
-            <span id="menu-btn-lbl">Menú</span>
-          </button>
-          <button class="btn-danger" id="give-up-btn" onclick="giveUp()" style="display:none;">
-            <span id="give-up-lbl">Ver respuesta</span>
-          </button>
+          <button class="btn-primary" id="check-btn" onclick="checkAnswer()"><span id="check-btn-lbl">✓ Verificar</span></button>
+          <button class="btn-secondary" id="menu-btn" onclick="returnToMenu()"><span id="menu-btn-lbl">Menú</span></button>
+          <button class="btn-danger" id="give-up-btn" onclick="giveUp()" style="display:none;"><span id="give-up-lbl">Ver respuesta</span></button>
         </div>
       </div>
     </div>
 
-    <!-- Focus words section -->
+    <!-- In-session focus list -->
     <div class="card" id="focus-section">
       <div class="focus-header">
         <h3 id="focus-title">📋 Lista para padres</h3>
@@ -868,235 +384,287 @@
     </div>
 
   </div><!-- end game-area -->
-
 </main>
+</div><!-- end page-game -->
+
+<!-- ═══════════════ REVIEW PAGE ═══════════════ -->
+<div class="page" id="page-review">
+<div class="review-page-wrap">
+
+  <div class="review-hero card">
+    <h2 id="review-title">📋 Words to Review</h2>
+    <p id="review-desc">All words he has struggled with, sorted by most errors first. Saved across sessions.</p>
+
+    <div class="review-summary-grid">
+      <div class="review-stat">
+        <div class="review-stat-num red" id="rv-total-wrong">0</div>
+        <div class="review-stat-lbl" id="rv-wrong-lbl">Spelling Errors</div>
+      </div>
+      <div class="review-stat">
+        <div class="review-stat-num yellow" id="rv-total-near">0</div>
+        <div class="review-stat-lbl" id="rv-near-lbl">Accent Errors</div>
+      </div>
+      <div class="review-stat">
+        <div class="review-stat-num green" id="rv-total-mastered">0</div>
+        <div class="review-stat-lbl" id="rv-mastered-lbl">Mastered</div>
+      </div>
+    </div>
+
+    <div class="review-actions">
+      <button class="btn-review-dl" onclick="downloadFullCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span id="rv-download-lbl">Download CSV</span>
+      </button>
+      <button class="btn-clear-history" onclick="confirmClearHistory()">
+        <span id="rv-clear-lbl">Clear History</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter tabs -->
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all')" id="ft-all"><span id="ft-all-lbl">All</span></button>
+      <button class="filter-tab" onclick="setFilter('wrong')" id="ft-wrong"><span id="ft-wrong-lbl">Spelling</span></button>
+      <button class="filter-tab" onclick="setFilter('near')" id="ft-near"><span id="ft-near-lbl">Accents</span></button>
+      <button class="filter-tab" onclick="setFilter('mastered')" id="ft-mastered"><span id="ft-mastered-lbl">Mastered</span></button>
+    </div>
+    <button class="btn-secondary" style="padding:8px 14px;font-size:13px;" onclick="showGamePage()">
+      <span id="rv-back-lbl">← Back</span>
+    </button>
+  </div>
+
+  <!-- Word table -->
+  <div class="word-table-wrap" id="word-table-wrap">
+    <div class="word-table-header">
+      <div id="th-word">Word</div>
+      <div style="text-align:center;" id="th-wrong">❌</div>
+      <div style="text-align:center;" id="th-near">⚠️</div>
+      <div style="text-align:center;" id="th-correct">✅</div>
+      <div style="text-align:center;" id="th-status">Status</div>
+    </div>
+    <div id="word-table-body"></div>
+  </div>
+
+</div>
+</div><!-- end page-review -->
 
 <script>
 // ══════════════════════════════════════════
-//  WORD LIST (1,070 words, embedded)
+//  WORD LIST
 // ══════════════════════════════════════════
 const WORDS = [{"id": 1, "word": "abandonado"}, {"id": 2, "word": "abastecimiento"}, {"id": 3, "word": "abolicionista"}, {"id": 4, "word": "abolir"}, {"id": 5, "word": "abracadabra"}, {"id": 6, "word": "abrazo"}, {"id": 7, "word": "abrocharte"}, {"id": 8, "word": "abrupto"}, {"id": 9, "word": "absolución"}, {"id": 10, "word": "absoluta"}, {"id": 11, "word": "absorbible"}, {"id": 12, "word": "absorción"}, {"id": 13, "word": "abuñolado"}, {"id": 14, "word": "abyección"}, {"id": 15, "word": "acallar"}, {"id": 16, "word": "acalorado"}, {"id": 17, "word": "acampar"}, {"id": 18, "word": "acañaverear"}, {"id": 19, "word": "acantáceo"}, {"id": 20, "word": "acantocéfalos"}, {"id": 21, "word": "acápite"}, {"id": 22, "word": "acaramelado"}, {"id": 23, "word": "acarrear"}, {"id": 24, "word": "acaserarse"}, {"id": 25, "word": "acaudillamiento"}, {"id": 26, "word": "acceder"}, {"id": 27, "word": "acción"}, {"id": 28, "word": "accionista"}, {"id": 29, "word": "acechar"}, {"id": 30, "word": "achucuyar"}, {"id": 31, "word": "acollarar"}, {"id": 32, "word": "acomodación"}, {"id": 33, "word": "acribilló"}, {"id": 34, "word": "acromático"}, {"id": 35, "word": "actitud"}, {"id": 36, "word": "actual"}, {"id": 37, "word": "acueducto"}, {"id": 38, "word": "adarve"}, {"id": 39, "word": "ademán"}, {"id": 40, "word": "aderezo"}, {"id": 41, "word": "adivinanza"}, {"id": 42, "word": "admisible"}, {"id": 43, "word": "admonición"}, {"id": 44, "word": "adolecer"}, {"id": 45, "word": "adoptar"}, {"id": 46, "word": "adoratriz"}, {"id": 47, "word": "adriático"}, {"id": 48, "word": "adulación"}, {"id": 49, "word": "aeropuerto"}, {"id": 50, "word": "afín"}, {"id": 51, "word": "agazaparse"}, {"id": 52, "word": "agobiante"}, {"id": 53, "word": "agosto"}, {"id": 54, "word": "agridulce"}, {"id": 55, "word": "aguarrás"}, {"id": 56, "word": "aherrumbrar"}, {"id": 57, "word": "ahora"}, {"id": 58, "word": "ahumado"}, {"id": 59, "word": "aire"}, {"id": 60, "word": "ajeno"}, {"id": 61, "word": "ajuar"}, {"id": 62, "word": "albino"}, {"id": 63, "word": "albóndiga"}, {"id": 64, "word": "alcachofa"}, {"id": 65, "word": "alcahuete"}, {"id": 66, "word": "alcornoque"}, {"id": 67, "word": "aldaba"}, {"id": 68, "word": "aldea"}, {"id": 69, "word": "aleación"}, {"id": 70, "word": "alegría"}, {"id": 71, "word": "alemán"}, {"id": 72, "word": "alevosía"}, {"id": 73, "word": "alfabeto"}, {"id": 74, "word": "alfeizar"}, {"id": 75, "word": "alfiler"}, {"id": 76, "word": "alguacil"}, {"id": 77, "word": "alijo"}, {"id": 78, "word": "alimentación"}, {"id": 79, "word": "aliteración"}, {"id": 80, "word": "almeja"}, {"id": 81, "word": "almohada"}, {"id": 82, "word": "alteración"}, {"id": 83, "word": "altimetría"}, {"id": 84, "word": "amables"}, {"id": 85, "word": "amada"}, {"id": 86, "word": "amar"}, {"id": 87, "word": "ámbito"}, {"id": 88, "word": "ambivalencia"}, {"id": 89, "word": "ambulatorio"}, {"id": 90, "word": "amo"}, {"id": 91, "word": "analgésico"}, {"id": 92, "word": "anatomopatológico"}, {"id": 93, "word": "añejo"}, {"id": 94, "word": "anexo"}, {"id": 95, "word": "anhidrosis"}, {"id": 96, "word": "anillo"}, {"id": 97, "word": "anís"}, {"id": 98, "word": "ánodo"}, {"id": 99, "word": "antibiótico"}, {"id": 100, "word": "antiguo"}, {"id": 101, "word": "antojo"}, {"id": 102, "word": "antropófago"}, {"id": 103, "word": "antropozoico"}, {"id": 104, "word": "aparato"}, {"id": 105, "word": "apelación"}, {"id": 106, "word": "apéndice"}, {"id": 107, "word": "apófisis"}, {"id": 108, "word": "apoyar"}, {"id": 109, "word": "aprehensivo"}, {"id": 110, "word": "aprovisionamiento"}, {"id": 111, "word": "aproximación"}, {"id": 112, "word": "aquilino"}, {"id": 113, "word": "archiduque"}, {"id": 114, "word": "arcilla"}, {"id": 115, "word": "ardid"}, {"id": 116, "word": "área"}, {"id": 117, "word": "armazón"}, {"id": 118, "word": "aroma"}, {"id": 119, "word": "arquetipo"}, {"id": 120, "word": "arteria"}, {"id": 121, "word": "artesano"}, {"id": 122, "word": "artificial"}, {"id": 123, "word": "artimaña"}, {"id": 124, "word": "artista"}, {"id": 125, "word": "asambleísta"}, {"id": 126, "word": "aséptico"}, {"id": 127, "word": "astronómico"}, {"id": 128, "word": "atareada"}, {"id": 129, "word": "atolladero"}, {"id": 130, "word": "auscultación"}, {"id": 131, "word": "autobiografía"}, {"id": 132, "word": "auxilio"}, {"id": 133, "word": "avaricia"}, {"id": 134, "word": "avioneta"}, {"id": 135, "word": "ayuda"}, {"id": 136, "word": "azafrán"}, {"id": 137, "word": "azahar"}, {"id": 138, "word": "báculo"}, {"id": 139, "word": "badén"}, {"id": 140, "word": "bajorrelieve"}, {"id": 141, "word": "bala"}, {"id": 142, "word": "balancín"}, {"id": 143, "word": "balaustrada"}, {"id": 144, "word": "balbucear"}, {"id": 145, "word": "balsa"}, {"id": 146, "word": "bálsamo"}, {"id": 147, "word": "bamba"}, {"id": 148, "word": "bambalina"}, {"id": 149, "word": "barbaries"}, {"id": 150, "word": "barbilla"}, {"id": 151, "word": "barbitúrico"}, {"id": 152, "word": "barítono"}, {"id": 153, "word": "barrabasada"}, {"id": 154, "word": "Barranquilla"}, {"id": 155, "word": "báscula"}, {"id": 156, "word": "basilisco"}, {"id": 157, "word": "batacazo"}, {"id": 158, "word": "baúl"}, {"id": 159, "word": "bautizado"}, {"id": 160, "word": "beatífico"}, {"id": 161, "word": "beneplácito"}, {"id": 162, "word": "benévolo"}, {"id": 163, "word": "bengala"}, {"id": 164, "word": "beréber"}, {"id": 165, "word": "bermellón"}, {"id": 166, "word": "berrinche"}, {"id": 167, "word": "besar"}, {"id": 168, "word": "bético"}, {"id": 169, "word": "bicéfala"}, {"id": 170, "word": "bien"}, {"id": 171, "word": "bienaventurado"}, {"id": 172, "word": "bienaventuranza"}, {"id": 173, "word": "bigudí"}, {"id": 174, "word": "bisabuelo"}, {"id": 175, "word": "bisagra"}, {"id": 176, "word": "bisutería"}, {"id": 177, "word": "blanquear"}, {"id": 178, "word": "blasón"}, {"id": 179, "word": "bodega"}, {"id": 180, "word": "bodegón"}, {"id": 181, "word": "bolsillo"}, {"id": 182, "word": "bombilla"}, {"id": 183, "word": "bonito"}, {"id": 184, "word": "bonzo"}, {"id": 185, "word": "boquiabierto"}, {"id": 186, "word": "borceguí"}, {"id": 187, "word": "bostezar"}, {"id": 188, "word": "botijo"}, {"id": 189, "word": "boyante"}, {"id": 190, "word": "bozal"}, {"id": 191, "word": "brebaje"}, {"id": 192, "word": "bretón"}, {"id": 193, "word": "brinco"}, {"id": 194, "word": "bronquio"}, {"id": 195, "word": "bruto"}, {"id": 196, "word": "buitre"}, {"id": 197, "word": "bulto"}, {"id": 198, "word": "burbuja"}, {"id": 199, "word": "burocracia"}, {"id": 200, "word": "cabalgar"}, {"id": 201, "word": "caballeresco"}, {"id": 202, "word": "cabuyería"}, {"id": 203, "word": "cacatúa"}, {"id": 204, "word": "cachorro"}, {"id": 205, "word": "caducifolio"}, {"id": 206, "word": "calabaza"}, {"id": 207, "word": "calamar"}, {"id": 208, "word": "calavera"}, {"id": 209, "word": "calcetín"}, {"id": 210, "word": "calculó"}, {"id": 211, "word": "calefacción"}, {"id": 212, "word": "caligrafía"}, {"id": 213, "word": "calmado"}, {"id": 214, "word": "camilla"}, {"id": 215, "word": "caminar"}, {"id": 216, "word": "canica"}, {"id": 217, "word": "canjear"}, {"id": 218, "word": "caparazón"}, {"id": 219, "word": "capicúa"}, {"id": 220, "word": "característico"}, {"id": 221, "word": "caramelo"}, {"id": 222, "word": "caricatura"}, {"id": 223, "word": "carpintero"}, {"id": 224, "word": "carrete"}, {"id": 225, "word": "cascabel"}, {"id": 226, "word": "catabólico"}, {"id": 227, "word": "catamarán"}, {"id": 228, "word": "catapultar"}, {"id": 229, "word": "catarsis"}, {"id": 230, "word": "caucásico"}, {"id": 231, "word": "cecografía"}, {"id": 232, "word": "cenicienta"}, {"id": 233, "word": "censurable"}, {"id": 234, "word": "centígrado"}, {"id": 235, "word": "centímetro"}, {"id": 236, "word": "cerámica"}, {"id": 237, "word": "cerbatana"}, {"id": 238, "word": "cerebro"}, {"id": 239, "word": "cerrojo"}, {"id": 240, "word": "certidumbre"}, {"id": 241, "word": "cesárea"}, {"id": 242, "word": "chancleta"}, {"id": 243, "word": "chándal"}, {"id": 244, "word": "charcutería"}, {"id": 245, "word": "chiflón"}, {"id": 246, "word": "chiismo"}, {"id": 247, "word": "chilindrón"}, {"id": 248, "word": "chistoso"}, {"id": 249, "word": "chivata"}, {"id": 250, "word": "chivato"}, {"id": 251, "word": "chungo"}, {"id": 252, "word": "cicatrizar"}, {"id": 253, "word": "ciempiés"}, {"id": 254, "word": "científico"}, {"id": 255, "word": "cilíndrico"}, {"id": 256, "word": "cimbrar"}, {"id": 257, "word": "cinematografía"}, {"id": 258, "word": "cinturón"}, {"id": 259, "word": "circunferencia"}, {"id": 260, "word": "claridad"}, {"id": 261, "word": "clavícula"}, {"id": 262, "word": "coartada"}, {"id": 263, "word": "cobertizo"}, {"id": 264, "word": "cognitivo"}, {"id": 265, "word": "coliflor"}, {"id": 266, "word": "comunicación"}, {"id": 267, "word": "concha"}, {"id": 268, "word": "concreto"}, {"id": 269, "word": "congénito"}, {"id": 270, "word": "congestión"}, {"id": 271, "word": "conocer"}, {"id": 272, "word": "conspiración"}, {"id": 273, "word": "conspirar"}, {"id": 274, "word": "constelación"}, {"id": 275, "word": "constipar"}, {"id": 276, "word": "contiguo"}, {"id": 277, "word": "corregir"}, {"id": 278, "word": "cosechar"}, {"id": 279, "word": "cosmovisión"}, {"id": 280, "word": "costa"}, {"id": 281, "word": "cráter"}, {"id": 282, "word": "creer"}, {"id": 283, "word": "cripta"}, {"id": 284, "word": "cruzada"}, {"id": 285, "word": "cuaderno"}, {"id": 286, "word": "cucaracha"}, {"id": 287, "word": "cuchara"}, {"id": 288, "word": "cuchilla"}, {"id": 289, "word": "cúspide"}, {"id": 290, "word": "cutis"}, {"id": 291, "word": "dado"}, {"id": 292, "word": "deber"}, {"id": 293, "word": "debutar"}, {"id": 294, "word": "decapitación"}, {"id": 295, "word": "decrépito"}, {"id": 296, "word": "deductivo"}, {"id": 297, "word": "degenerativo"}, {"id": 298, "word": "demostración"}, {"id": 299, "word": "departamento"}, {"id": 300, "word": "deporte"}, {"id": 301, "word": "derranchadamente"}, {"id": 302, "word": "desarrollo"}, {"id": 303, "word": "desayunar"}, {"id": 304, "word": "desbordamiento"}, {"id": 305, "word": "descalcificación"}, {"id": 306, "word": "descarrilamiento"}, {"id": 307, "word": "desconcertante"}, {"id": 308, "word": "descubrimiento"}, {"id": 309, "word": "deshuesar"}, {"id": 310, "word": "desintegrar"}, {"id": 311, "word": "desmayarse"}, {"id": 312, "word": "desnutrición"}, {"id": 313, "word": "despegue"}, {"id": 314, "word": "despejar"}, {"id": 315, "word": "despertador"}, {"id": 316, "word": "destino"}, {"id": 317, "word": "detalle"}, {"id": 318, "word": "devoción"}, {"id": 319, "word": "diabético"}, {"id": 320, "word": "diaconal"}, {"id": 321, "word": "diacrítico"}, {"id": 322, "word": "diciembre"}, {"id": 323, "word": "dictador"}, {"id": 324, "word": "diente"}, {"id": 325, "word": "difusión"}, {"id": 326, "word": "director"}, {"id": 327, "word": "disculpa"}, {"id": 328, "word": "discusión"}, {"id": 329, "word": "disparatado"}, {"id": 330, "word": "disquisición"}, {"id": 331, "word": "divergir"}, {"id": 332, "word": "dodecaedro"}, {"id": 333, "word": "ebanistería"}, {"id": 334, "word": "ecografía"}, {"id": 335, "word": "edredón"}, {"id": 336, "word": "efectividad"}, {"id": 337, "word": "egoísmo"}, {"id": 338, "word": "ejecutar"}, {"id": 339, "word": "ejecutivos"}, {"id": 340, "word": "ejemplificación"}, {"id": 341, "word": "ejemplo"}, {"id": 342, "word": "ejercitar"}, {"id": 343, "word": "elección"}, {"id": 344, "word": "eléctrico"}, {"id": 345, "word": "electrostático"}, {"id": 346, "word": "embalaje"}, {"id": 347, "word": "embarazoso"}, {"id": 348, "word": "embotellado"}, {"id": 349, "word": "embrague"}, {"id": 350, "word": "embravecer"}, {"id": 351, "word": "embriológico"}, {"id": 352, "word": "emigración"}, {"id": 353, "word": "empréstito"}, {"id": 354, "word": "encanto"}, {"id": 355, "word": "encauzar"}, {"id": 356, "word": "enchufar"}, {"id": 357, "word": "enclaustrado"}, {"id": 358, "word": "enclenque"}, {"id": 359, "word": "encontrar"}, {"id": 360, "word": "encrucijada"}, {"id": 361, "word": "endocrinólogo"}, {"id": 362, "word": "energúmeno"}, {"id": 363, "word": "enfurruñarse"}, {"id": 364, "word": "enhorabuena"}, {"id": 365, "word": "enjabonarme"}, {"id": 366, "word": "enjaretar"}, {"id": 367, "word": "enredar"}, {"id": 368, "word": "ensuciado"}, {"id": 369, "word": "entender"}, {"id": 370, "word": "entomólogo"}, {"id": 371, "word": "entrada"}, {"id": 372, "word": "entrenar"}, {"id": 373, "word": "epidemiología"}, {"id": 374, "word": "equilibrista"}, {"id": 375, "word": "equinoccio"}, {"id": 376, "word": "ermitaño"}, {"id": 377, "word": "esbeltez"}, {"id": 378, "word": "escabeche"}, {"id": 379, "word": "escama"}, {"id": 380, "word": "escamochar"}, {"id": 381, "word": "escápula"}, {"id": 382, "word": "escarabajo"}, {"id": 383, "word": "escarmiento"}, {"id": 384, "word": "escena"}, {"id": 385, "word": "escenificación"}, {"id": 386, "word": "escenografía"}, {"id": 387, "word": "escoba"}, {"id": 388, "word": "escribir"}, {"id": 389, "word": "escuadrón"}, {"id": 390, "word": "escuálido"}, {"id": 391, "word": "escudriñar"}, {"id": 392, "word": "escuela"}, {"id": 393, "word": "esencia"}, {"id": 394, "word": "esfuerzo"}, {"id": 395, "word": "esgrimir"}, {"id": 396, "word": "eslabón"}, {"id": 397, "word": "espabilado"}, {"id": 398, "word": "espalda"}, {"id": 399, "word": "esparadrapo"}, {"id": 400, "word": "espárrago"}, {"id": 401, "word": "especialmente"}, {"id": 402, "word": "espejismo"}, {"id": 403, "word": "esperar"}, {"id": 404, "word": "espía"}, {"id": 405, "word": "espinilla"}, {"id": 406, "word": "esquizofrénico"}, {"id": 407, "word": "estación"}, {"id": 408, "word": "estampado"}, {"id": 409, "word": "estatuto"}, {"id": 410, "word": "estereotipado"}, {"id": 411, "word": "estiércol"}, {"id": 412, "word": "estimar"}, {"id": 413, "word": "estómago"}, {"id": 414, "word": "estrangular"}, {"id": 415, "word": "estratagema"}, {"id": 416, "word": "estrategia"}, {"id": 417, "word": "estrato"}, {"id": 418, "word": "estribillo"}, {"id": 419, "word": "estudiante"}, {"id": 420, "word": "ética"}, {"id": 421, "word": "exabrupto"}, {"id": 422, "word": "exacerbado"}, {"id": 423, "word": "exageración"}, {"id": 424, "word": "examinar"}, {"id": 425, "word": "excepto"}, {"id": 426, "word": "exhalación"}, {"id": 427, "word": "exhortación"}, {"id": 428, "word": "éxodo"}, {"id": 429, "word": "exonerado"}, {"id": 430, "word": "exordio"}, {"id": 431, "word": "experimento"}, {"id": 432, "word": "explotar"}, {"id": 433, "word": "exposición"}, {"id": 434, "word": "expósito"}, {"id": 435, "word": "extendido"}, {"id": 436, "word": "exterior"}, {"id": 437, "word": "extracomunitario"}, {"id": 438, "word": "extravió"}, {"id": 439, "word": "fácil"}, {"id": 440, "word": "factótum"}, {"id": 441, "word": "falda"}, {"id": 442, "word": "falúa"}, {"id": 443, "word": "familia"}, {"id": 444, "word": "fantasía"}, {"id": 445, "word": "farmacia"}, {"id": 446, "word": "fascículo"}, {"id": 447, "word": "fatal"}, {"id": 448, "word": "fe"}, {"id": 449, "word": "fémur"}, {"id": 450, "word": "ferroviario"}, {"id": 451, "word": "filantropía"}, {"id": 452, "word": "filantrópico"}, {"id": 453, "word": "filarmónica"}, {"id": 454, "word": "filatélico"}, {"id": 455, "word": "filigrana"}, {"id": 456, "word": "filipino"}, {"id": 457, "word": "filmoteca"}, {"id": 458, "word": "filología"}, {"id": 459, "word": "filosófico"}, {"id": 460, "word": "flaco"}, {"id": 461, "word": "flecha"}, {"id": 462, "word": "flojera"}, {"id": 463, "word": "florido"}, {"id": 464, "word": "forja"}, {"id": 465, "word": "fortuito"}, {"id": 466, "word": "forzar"}, {"id": 467, "word": "fosforescente"}, {"id": 468, "word": "fragilidad"}, {"id": 469, "word": "frangollo"}, {"id": 470, "word": "frescor"}, {"id": 471, "word": "frigorífico"}, {"id": 472, "word": "fundir"}, {"id": 473, "word": "furioso"}, {"id": 474, "word": "fusión"}, {"id": 475, "word": "futuro"}, {"id": 476, "word": "futurólogo"}, {"id": 477, "word": "galáctico"}, {"id": 478, "word": "galardón"}, {"id": 479, "word": "galaxia"}, {"id": 480, "word": "galés"}, {"id": 481, "word": "galimatías"}, {"id": 482, "word": "gamuza"}, {"id": 483, "word": "ganador"}, {"id": 484, "word": "ganar"}, {"id": 485, "word": "ganga"}, {"id": 486, "word": "gastroduodenal"}, {"id": 487, "word": "gazuza"}, {"id": 488, "word": "gelatinoso"}, {"id": 489, "word": "genealógico"}, {"id": 490, "word": "genética"}, {"id": 491, "word": "genuflexión"}, {"id": 492, "word": "geometría"}, {"id": 493, "word": "geriatría"}, {"id": 494, "word": "gesticular"}, {"id": 495, "word": "gigantismo"}, {"id": 496, "word": "girómetro"}, {"id": 497, "word": "glamour"}, {"id": 498, "word": "glomérulo"}, {"id": 499, "word": "gloria"}, {"id": 500, "word": "glotis"}, {"id": 501, "word": "gozoso"}, {"id": 502, "word": "grabadora"}, {"id": 503, "word": "graduación"}, {"id": 504, "word": "gravilla"}, {"id": 505, "word": "grisácea"}, {"id": 506, "word": "griterío"}, {"id": 507, "word": "guacarnaco"}, {"id": 508, "word": "guirnaldas"}, {"id": 509, "word": "gusano"}, {"id": 510, "word": "habón"}, {"id": 511, "word": "halcón"}, {"id": 512, "word": "haraganería"}, {"id": 513, "word": "hastial"}, {"id": 514, "word": "haya"}, {"id": 515, "word": "hazaña"}, {"id": 516, "word": "hebdómada"}, {"id": 517, "word": "hebilla"}, {"id": 518, "word": "hecatombe"}, {"id": 519, "word": "hechiceresco"}, {"id": 520, "word": "hechicero"}, {"id": 521, "word": "hediondo"}, {"id": 522, "word": "hegemonía"}, {"id": 523, "word": "hegemónico"}, {"id": 524, "word": "helecho"}, {"id": 525, "word": "hélice"}, {"id": 526, "word": "heteróclitas"}, {"id": 527, "word": "hexagonal"}, {"id": 528, "word": "hidratante"}, {"id": 529, "word": "hincapié"}, {"id": 530, "word": "hiperventilar"}, {"id": 531, "word": "hipervitaminosis"}, {"id": 532, "word": "histérico"}, {"id": 533, "word": "horchata"}, {"id": 534, "word": "hortícola"}, {"id": 535, "word": "huelguista"}, {"id": 536, "word": "húmedo"}, {"id": 537, "word": "huracán"}, {"id": 538, "word": "hurón"}, {"id": 539, "word": "husillero"}, {"id": 540, "word": "icástico"}, {"id": 541, "word": "ictiología"}, {"id": 542, "word": "ignición"}, {"id": 543, "word": "igual"}, {"id": 544, "word": "igualitarismo"}, {"id": 545, "word": "iluminación"}, {"id": 546, "word": "imagen"}, {"id": 547, "word": "imberbe"}, {"id": 548, "word": "impaciencia"}, {"id": 549, "word": "impávido"}, {"id": 550, "word": "imperturbabilidad"}, {"id": 551, "word": "importar"}, {"id": 552, "word": "imprevisible"}, {"id": 553, "word": "improvisación"}, {"id": 554, "word": "incandescente"}, {"id": 555, "word": "incivilizado"}, {"id": 556, "word": "inconveniente"}, {"id": 557, "word": "incorporación"}, {"id": 558, "word": "indicación"}, {"id": 559, "word": "indigestible"}, {"id": 560, "word": "indiscutible"}, {"id": 561, "word": "inenarrable"}, {"id": 562, "word": "inescrutable"}, {"id": 563, "word": "informar"}, {"id": 564, "word": "inglés"}, {"id": 565, "word": "inhábil"}, {"id": 566, "word": "inhalador"}, {"id": 567, "word": "inherente"}, {"id": 568, "word": "inmaculado"}, {"id": 569, "word": "innovación"}, {"id": 570, "word": "inquietante"}, {"id": 571, "word": "insidias"}, {"id": 572, "word": "insípido"}, {"id": 573, "word": "insoluble"}, {"id": 574, "word": "insomnio"}, {"id": 575, "word": "insonorizar"}, {"id": 576, "word": "inspiración"}, {"id": 577, "word": "instituto"}, {"id": 578, "word": "intelectual"}, {"id": 579, "word": "interacción"}, {"id": 580, "word": "intérprete"}, {"id": 581, "word": "introducción"}, {"id": 582, "word": "intromisión"}, {"id": 583, "word": "intuición"}, {"id": 584, "word": "inundación"}, {"id": 585, "word": "inútil"}, {"id": 586, "word": "investigación"}, {"id": 587, "word": "invulnerable"}, {"id": 588, "word": "inyección"}, {"id": 589, "word": "ironía"}, {"id": 590, "word": "isleño"}, {"id": 591, "word": "isótopo"}, {"id": 592, "word": "izquierdo"}, {"id": 593, "word": "jácara"}, {"id": 594, "word": "jalapeño"}, {"id": 595, "word": "jarabe"}, {"id": 596, "word": "jarrón"}, {"id": 597, "word": "jefatura"}, {"id": 598, "word": "jerarquía"}, {"id": 599, "word": "jergón"}, {"id": 600, "word": "jocosidad"}, {"id": 601, "word": "jocoso"}, {"id": 602, "word": "joven"}, {"id": 603, "word": "jubón"}, {"id": 604, "word": "juzgado"}, {"id": 605, "word": "laberíntico"}, {"id": 606, "word": "labriegos"}, {"id": 607, "word": "lámina"}, {"id": 608, "word": "lapislázuli"}, {"id": 609, "word": "largometraje"}, {"id": 610, "word": "larguirucho"}, {"id": 611, "word": "latido"}, {"id": 612, "word": "lavabo"}, {"id": 613, "word": "lavavajillas"}, {"id": 614, "word": "legión"}, {"id": 615, "word": "legítimo"}, {"id": 616, "word": "leguleyo"}, {"id": 617, "word": "lengüeta"}, {"id": 618, "word": "léxico"}, {"id": 619, "word": "libélula"}, {"id": 620, "word": "libidinoso"}, {"id": 621, "word": "librería"}, {"id": 622, "word": "lingüística"}, {"id": 623, "word": "líquido"}, {"id": 624, "word": "litro"}, {"id": 625, "word": "llanura"}, {"id": 626, "word": "llorona"}, {"id": 627, "word": "llovizna"}, {"id": 628, "word": "locuaz"}, {"id": 629, "word": "locutorio"}, {"id": 630, "word": "loxodromia"}, {"id": 631, "word": "luminoso"}, {"id": 632, "word": "luna"}, {"id": 633, "word": "lusitano"}, {"id": 634, "word": "machacón"}, {"id": 635, "word": "machihembrar"}, {"id": 636, "word": "magnesio"}, {"id": 637, "word": "mapamundi"}, {"id": 638, "word": "maravedinada"}, {"id": 639, "word": "marcapasos"}, {"id": 640, "word": "marchitar"}, {"id": 641, "word": "marinero"}, {"id": 642, "word": "mayorazgo"}, {"id": 643, "word": "mazorca"}, {"id": 644, "word": "mecanismo"}, {"id": 645, "word": "mejorar"}, {"id": 646, "word": "merovingio"}, {"id": 647, "word": "mesozoico"}, {"id": 648, "word": "metástasis"}, {"id": 649, "word": "método"}, {"id": 650, "word": "metodología"}, {"id": 651, "word": "microscópico"}, {"id": 652, "word": "migración"}, {"id": 653, "word": "mirada"}, {"id": 654, "word": "misión"}, {"id": 655, "word": "monolingüe"}, {"id": 656, "word": "morralla"}, {"id": 657, "word": "mortandad"}, {"id": 658, "word": "mover"}, {"id": 659, "word": "muletillero"}, {"id": 660, "word": "mundial"}, {"id": 661, "word": "muñeca"}, {"id": 662, "word": "musical"}, {"id": 663, "word": "naftalina"}, {"id": 664, "word": "naranja"}, {"id": 665, "word": "narcisismo"}, {"id": 666, "word": "náufrago"}, {"id": 667, "word": "náyade"}, {"id": 668, "word": "necio"}, {"id": 669, "word": "nécora"}, {"id": 670, "word": "necrófago"}, {"id": 671, "word": "necrología"}, {"id": 672, "word": "néctar"}, {"id": 673, "word": "Nefertiti"}, {"id": 674, "word": "nefrítico"}, {"id": 675, "word": "nefrología"}, {"id": 676, "word": "negligencia"}, {"id": 677, "word": "nenúfar"}, {"id": 678, "word": "neoexpresionismo"}, {"id": 679, "word": "nevera"}, {"id": 680, "word": "nido"}, {"id": 681, "word": "nieve"}, {"id": 682, "word": "nimiedad"}, {"id": 683, "word": "niño"}, {"id": 684, "word": "níquel"}, {"id": 685, "word": "nirvana"}, {"id": 686, "word": "noche"}, {"id": 687, "word": "nómada"}, {"id": 688, "word": "nombre"}, {"id": 689, "word": "nomenclátor"}, {"id": 690, "word": "nórdico"}, {"id": 691, "word": "normativa"}, {"id": 692, "word": "nostálgico"}, {"id": 693, "word": "novelístico"}, {"id": 694, "word": "novio"}, {"id": 695, "word": "novísimo"}, {"id": 696, "word": "novohispano"}, {"id": 697, "word": "núcleo"}, {"id": 698, "word": "nupcias"}, {"id": 699, "word": "obcecado"}, {"id": 700, "word": "obduración"}, {"id": 701, "word": "obedecer"}, {"id": 702, "word": "obliteración"}, {"id": 703, "word": "oblongo"}, {"id": 704, "word": "oboe"}, {"id": 705, "word": "obrero"}, {"id": 706, "word": "obsequioso"}, {"id": 707, "word": "occidentalizar"}, {"id": 708, "word": "oceanografía"}, {"id": 709, "word": "ocelote"}, {"id": 710, "word": "octogenario"}, {"id": 711, "word": "oculto"}, {"id": 712, "word": "odontoide"}, {"id": 713, "word": "ofrecer"}, {"id": 714, "word": "ofuscaba"}, {"id": 715, "word": "oír"}, {"id": 716, "word": "ojal"}, {"id": 717, "word": "olímpico"}, {"id": 718, "word": "olisquear"}, {"id": 719, "word": "onomástico"}, {"id": 720, "word": "ópalo"}, {"id": 721, "word": "operable"}, {"id": 722, "word": "opinión"}, {"id": 723, "word": "opíparo"}, {"id": 724, "word": "orangután"}, {"id": 725, "word": "órdago"}, {"id": 726, "word": "ordinariez"}, {"id": 727, "word": "organigrama"}, {"id": 728, "word": "organogénesis"}, {"id": 729, "word": "orgullo"}, {"id": 730, "word": "orgulloso"}, {"id": 731, "word": "orozuz"}, {"id": 732, "word": "otitis"}, {"id": 733, "word": "otomán"}, {"id": 734, "word": "oxigenar"}, {"id": 735, "word": "oxímoron"}, {"id": 736, "word": "pabellón"}, {"id": 737, "word": "pagaduría"}, {"id": 738, "word": "pájaro"}, {"id": 739, "word": "palaciegas"}, {"id": 740, "word": "paleontología"}, {"id": 741, "word": "paliativo"}, {"id": 742, "word": "pálido"}, {"id": 743, "word": "palmípedo"}, {"id": 744, "word": "pánfilo"}, {"id": 745, "word": "paparrucha"}, {"id": 746, "word": "papelería"}, {"id": 747, "word": "papiroflexia"}, {"id": 748, "word": "paquete"}, {"id": 749, "word": "paracetamol"}, {"id": 750, "word": "parafrasear"}, {"id": 751, "word": "paráfrasis"}, {"id": 752, "word": "paraíso"}, {"id": 753, "word": "paralelogramo"}, {"id": 754, "word": "páramo"}, {"id": 755, "word": "parásito"}, {"id": 756, "word": "paréntesis"}, {"id": 757, "word": "parihuela"}, {"id": 758, "word": "parlanchín"}, {"id": 759, "word": "parótida"}, {"id": 760, "word": "párpado"}, {"id": 761, "word": "parquímetro"}, {"id": 762, "word": "parsimonia"}, {"id": 763, "word": "partenogénesis"}, {"id": 764, "word": "partido"}, {"id": 765, "word": "pasador"}, {"id": 766, "word": "pasamontañas"}, {"id": 767, "word": "pasantía"}, {"id": 768, "word": "pasión"}, {"id": 769, "word": "paspartú"}, {"id": 770, "word": "pastel"}, {"id": 771, "word": "pastizal"}, {"id": 772, "word": "paupérrimas"}, {"id": 773, "word": "pavimento"}, {"id": 774, "word": "peatón"}, {"id": 775, "word": "pectina"}, {"id": 776, "word": "pectiniforme"}, {"id": 777, "word": "pelear"}, {"id": 778, "word": "peonza"}, {"id": 779, "word": "peor"}, {"id": 780, "word": "pequinés"}, {"id": 781, "word": "perdonar"}, {"id": 782, "word": "pérgola"}, {"id": 783, "word": "período"}, {"id": 784, "word": "periplo"}, {"id": 785, "word": "perlé"}, {"id": 786, "word": "persiana"}, {"id": 787, "word": "personificación"}, {"id": 788, "word": "pescador"}, {"id": 789, "word": "pestaña"}, {"id": 790, "word": "pestilencia"}, {"id": 791, "word": "pez"}, {"id": 792, "word": "picante"}, {"id": 793, "word": "pícaro"}, {"id": 794, "word": "pierna"}, {"id": 795, "word": "pieza"}, {"id": 796, "word": "pimentón"}, {"id": 797, "word": "pimiento"}, {"id": 798, "word": "pingüino"}, {"id": 799, "word": "piragüista"}, {"id": 800, "word": "pirata"}, {"id": 801, "word": "piscicultor"}, {"id": 802, "word": "placaje"}, {"id": 803, "word": "plaza"}, {"id": 804, "word": "pleonasmos"}, {"id": 805, "word": "pluma"}, {"id": 806, "word": "plusvalía"}, {"id": 807, "word": "pocilga"}, {"id": 808, "word": "poeta"}, {"id": 809, "word": "polifagia"}, {"id": 810, "word": "posavasos"}, {"id": 811, "word": "posmodernista"}, {"id": 812, "word": "póstumo"}, {"id": 813, "word": "precoz"}, {"id": 814, "word": "pregunta"}, {"id": 815, "word": "prehelénico"}, {"id": 816, "word": "presente"}, {"id": 817, "word": "presunción"}, {"id": 818, "word": "pretérito"}, {"id": 819, "word": "prevalencia"}, {"id": 820, "word": "primavera"}, {"id": 821, "word": "principalmente"}, {"id": 822, "word": "prístino"}, {"id": 823, "word": "probar"}, {"id": 824, "word": "problema"}, {"id": 825, "word": "prólogo"}, {"id": 826, "word": "pronto"}, {"id": 827, "word": "protección"}, {"id": 828, "word": "proveedor"}, {"id": 829, "word": "prueba"}, {"id": 830, "word": "publicación"}, {"id": 831, "word": "puchero"}, {"id": 832, "word": "pulmonía"}, {"id": 833, "word": "pulsador"}, {"id": 834, "word": "pureza"}, {"id": 835, "word": "querer"}, {"id": 836, "word": "quinceañera"}, {"id": 837, "word": "ráfaga"}, {"id": 838, "word": "raíz"}, {"id": 839, "word": "ralentí"}, {"id": 840, "word": "rallador"}, {"id": 841, "word": "razón"}, {"id": 842, "word": "reacción"}, {"id": 843, "word": "real"}, {"id": 844, "word": "rebuznar"}, {"id": 845, "word": "recado"}, {"id": 846, "word": "recibimiento"}, {"id": 847, "word": "reciclado"}, {"id": 848, "word": "recital"}, {"id": 849, "word": "reconciliación"}, {"id": 850, "word": "recreativo"}, {"id": 851, "word": "rectángulo"}, {"id": 852, "word": "redacción"}, {"id": 853, "word": "reembolso"}, {"id": 854, "word": "reflexión"}, {"id": 855, "word": "refrán"}, {"id": 856, "word": "regresar"}, {"id": 857, "word": "reivindicaron"}, {"id": 858, "word": "rejuvenecimiento"}, {"id": 859, "word": "relación"}, {"id": 860, "word": "renacuajo"}, {"id": 861, "word": "rencor"}, {"id": 862, "word": "renovación"}, {"id": 863, "word": "repugnancia"}, {"id": 864, "word": "reservado"}, {"id": 865, "word": "resistencia"}, {"id": 866, "word": "respeto"}, {"id": 867, "word": "retorno"}, {"id": 868, "word": "retransmitir"}, {"id": 869, "word": "retruécano"}, {"id": 870, "word": "revista"}, {"id": 871, "word": "revuelo"}, {"id": 872, "word": "rezongar"}, {"id": 873, "word": "rezumó"}, {"id": 874, "word": "rifa"}, {"id": 875, "word": "rígido"}, {"id": 876, "word": "rimbombante"}, {"id": 877, "word": "riqueza"}, {"id": 878, "word": "rizo"}, {"id": 879, "word": "rodillera"}, {"id": 880, "word": "roedor"}, {"id": 881, "word": "rojizo"}, {"id": 882, "word": "ronquido"}, {"id": 883, "word": "rótulo"}, {"id": 884, "word": "rúbrica"}, {"id": 885, "word": "ruido"}, {"id": 886, "word": "sacacorchos"}, {"id": 887, "word": "sáfico"}, {"id": 888, "word": "sajo"}, {"id": 889, "word": "salamandra"}, {"id": 890, "word": "salida"}, {"id": 891, "word": "salsera"}, {"id": 892, "word": "samurái"}, {"id": 893, "word": "sanción"}, {"id": 894, "word": "sándalo"}, {"id": 895, "word": "saqueo"}, {"id": 896, "word": "sartén"}, {"id": 897, "word": "satírico"}, {"id": 898, "word": "satisfacción"}, {"id": 899, "word": "sátrapa"}, {"id": 900, "word": "saxátiles"}, {"id": 901, "word": "secano"}, {"id": 902, "word": "secreto"}, {"id": 903, "word": "segmento"}, {"id": 904, "word": "segundo"}, {"id": 905, "word": "serenidad"}, {"id": 906, "word": "servidor"}, {"id": 907, "word": "servidumbre"}, {"id": 908, "word": "sextilla"}, {"id": 909, "word": "siamés"}, {"id": 910, "word": "siempre"}, {"id": 911, "word": "sifón"}, {"id": 912, "word": "simple"}, {"id": 913, "word": "sinceramente"}, {"id": 914, "word": "sincronización"}, {"id": 915, "word": "socio"}, {"id": 916, "word": "sol"}, {"id": 917, "word": "soldado"}, {"id": 918, "word": "soliloquio"}, {"id": 919, "word": "solución"}, {"id": 920, "word": "solvencia"}, {"id": 921, "word": "somnoliento"}, {"id": 922, "word": "sonrisa"}, {"id": 923, "word": "soporíferas"}, {"id": 924, "word": "sorpresa"}, {"id": 925, "word": "sospechar"}, {"id": 926, "word": "sótano"}, {"id": 927, "word": "suavizante"}, {"id": 928, "word": "subconsciencia"}, {"id": 929, "word": "subdivisión"}, {"id": 930, "word": "sublevación"}, {"id": 931, "word": "subsanación"}, {"id": 932, "word": "substitutivo"}, {"id": 933, "word": "subterráneo"}, {"id": 934, "word": "suburbio"}, {"id": 935, "word": "succión"}, {"id": 936, "word": "sucesión"}, {"id": 937, "word": "sudorífico"}, {"id": 938, "word": "suizo"}, {"id": 939, "word": "sulfhídrico"}, {"id": 940, "word": "sultán"}, {"id": 941, "word": "sumar"}, {"id": 942, "word": "sumisión"}, {"id": 943, "word": "superficie"}, {"id": 944, "word": "superstición"}, {"id": 945, "word": "susceptible"}, {"id": 946, "word": "tabacón"}, {"id": 947, "word": "tabasco"}, {"id": 948, "word": "tacatá"}, {"id": 949, "word": "tahúr"}, {"id": 950, "word": "tailandés"}, {"id": 951, "word": "tango"}, {"id": 952, "word": "taquillón"}, {"id": 953, "word": "tarabilla"}, {"id": 954, "word": "tarambana"}, {"id": 955, "word": "tardío"}, {"id": 956, "word": "tartamudez"}, {"id": 957, "word": "tártaro"}, {"id": 958, "word": "tauromaquia"}, {"id": 959, "word": "taxista"}, {"id": 960, "word": "tectónico"}, {"id": 961, "word": "teflón"}, {"id": 962, "word": "tejado"}, {"id": 963, "word": "tejón"}, {"id": 964, "word": "teléfono"}, {"id": 965, "word": "tentáculo"}, {"id": 966, "word": "terrón"}, {"id": 967, "word": "testificar"}, {"id": 968, "word": "tetrabrik"}, {"id": 969, "word": "tierra"}, {"id": 970, "word": "tímido"}, {"id": 971, "word": "timón"}, {"id": 972, "word": "tímpano"}, {"id": 973, "word": "típico"}, {"id": 974, "word": "tiquismiquis"}, {"id": 975, "word": "tiranía"}, {"id": 976, "word": "titularización"}, {"id": 977, "word": "toalla"}, {"id": 978, "word": "todavía"}, {"id": 979, "word": "tónico"}, {"id": 980, "word": "tornado"}, {"id": 981, "word": "torpeza"}, {"id": 982, "word": "toxicómano"}, {"id": 983, "word": "trabajo"}, {"id": 984, "word": "tráfago"}, {"id": 985, "word": "traje"}, {"id": 986, "word": "transparencia"}, {"id": 987, "word": "transportar"}, {"id": 988, "word": "trascendental"}, {"id": 989, "word": "trasluz"}, {"id": 990, "word": "trayectoria"}, {"id": 991, "word": "trazo"}, {"id": 992, "word": "tremendo"}, {"id": 993, "word": "tríada"}, {"id": 994, "word": "tuétano"}, {"id": 995, "word": "tumbona"}, {"id": 996, "word": "ukelele"}, {"id": 997, "word": "úlcera"}, {"id": 998, "word": "último"}, {"id": 999, "word": "ultraísmo"}, {"id": 1000, "word": "umbilical"}, {"id": 1001, "word": "unción"}, {"id": 1002, "word": "ungüento"}, {"id": 1003, "word": "unigénito"}, {"id": 1004, "word": "unir"}, {"id": 1005, "word": "universo"}, {"id": 1006, "word": "urbanístico"}, {"id": 1007, "word": "uréter"}, {"id": 1008, "word": "Uruguay"}, {"id": 1009, "word": "usufructuario"}, {"id": 1010, "word": "útil"}, {"id": 1011, "word": "utilitarismo"}, {"id": 1012, "word": "utopía"}, {"id": 1013, "word": "vaciado"}, {"id": 1014, "word": "vagabundear"}, {"id": 1015, "word": "vaina"}, {"id": 1016, "word": "validez"}, {"id": 1017, "word": "valle"}, {"id": 1018, "word": "valoración"}, {"id": 1019, "word": "vehemencia"}, {"id": 1020, "word": "veintitantos"}, {"id": 1021, "word": "veleidad"}, {"id": 1022, "word": "vellosidad"}, {"id": 1023, "word": "Venecia"}, {"id": 1024, "word": "venganza"}, {"id": 1025, "word": "ventrisca"}, {"id": 1026, "word": "Veracruz"}, {"id": 1027, "word": "verborrea"}, {"id": 1028, "word": "veredicto"}, {"id": 1029, "word": "verídico"}, {"id": 1030, "word": "verosimilitud"}, {"id": 1031, "word": "verso"}, {"id": 1032, "word": "vertebrado"}, {"id": 1033, "word": "vértice"}, {"id": 1034, "word": "vesícula"}, {"id": 1035, "word": "viento"}, {"id": 1036, "word": "vihuela"}, {"id": 1037, "word": "vinatería"}, {"id": 1038, "word": "visigótico"}, {"id": 1039, "word": "visionario"}, {"id": 1040, "word": "vitriolo"}, {"id": 1041, "word": "víveres"}, {"id": 1042, "word": "vivienda"}, {"id": 1043, "word": "volver"}, {"id": 1044, "word": "voz"}, {"id": 1045, "word": "vozarrón"}, {"id": 1046, "word": "xenófobos"}, {"id": 1047, "word": "xerófilo"}, {"id": 1048, "word": "xerográfico"}, {"id": 1049, "word": "xilófono"}, {"id": 1050, "word": "yermo"}, {"id": 1051, "word": "yerno"}, {"id": 1052, "word": "yugular"}, {"id": 1053, "word": "zacateca"}, {"id": 1054, "word": "zafarrancho"}, {"id": 1055, "word": "zaherir"}, {"id": 1056, "word": "Zaire"}, {"id": 1057, "word": "zalamería"}, {"id": 1058, "word": "zalamero"}, {"id": 1059, "word": "zanahoria"}, {"id": 1060, "word": "zancadilla"}, {"id": 1061, "word": "zanganear"}, {"id": 1062, "word": "zanja"}, {"id": 1063, "word": "zanjar"}, {"id": 1064, "word": "zapatistas"}, {"id": 1065, "word": "zarigüeya"}, {"id": 1066, "word": "zarpa"}, {"id": 1067, "word": "zigzag"}, {"id": 1068, "word": "zoantropía"}, {"id": 1069, "word": "zombi"}, {"id": 1070, "word": "Zueco"}];
+
+// ══════════════════════════════════════════
+//  PERSISTENCE — localStorage
+// ══════════════════════════════════════════
+const LS_MASTERY = 'spelling_mastery_v2';
+const LS_FOCUS   = 'spelling_focus_v2';
+
+function loadFromStorage() {
+  try {
+    const m = localStorage.getItem(LS_MASTERY);
+    if (m) masteryMap = JSON.parse(m);
+    const f = localStorage.getItem(LS_FOCUS);
+    if (f) focusWords = JSON.parse(f);
+  } catch(e) { masteryMap = {}; focusWords = []; }
+}
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(LS_MASTERY, JSON.stringify(masteryMap));
+    localStorage.setItem(LS_FOCUS,   JSON.stringify(focusWords));
+  } catch(e) {}
+}
+
+function clearStorage() {
+  try {
+    localStorage.removeItem(LS_MASTERY);
+    localStorage.removeItem(LS_FOCUS);
+  } catch(e) {}
+  masteryMap = {};
+  focusWords = [];
+}
 
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
 let lang = 'en';
-let mode = 'practice'; // 'practice' | 'bee'
+let mode = 'practice';
 let sessionStarted = false;
 let currentWord = null;
 let wordHeard = false;
 let answered = false;
-let gaveUp = false;
+let currentFilter = 'all';
 
-// Session stats
-let correct = 0, wrong = 0, streak = 0, total = 0, bestStreak = 0;
-let streakHistory = []; // true/false last 10
+let correct = 0, wrong = 0, streak = 0, total = 0;
+let streakHistory = [];
 
-// Mastery tracking (persisted in sessionStorage)
-// masteryMap[id] = { correct: N, wrong: N, nearMiss: N, score: 0..4 }
+// masteryMap[id] = { correct, wrong, nearMiss, score }
+// score: 0=new, 1=learning, 2=progressing, 3=mastered
 let masteryMap = {};
-let focusWords = []; // {word, reason: 'wrong'|'near'}
+// focusWords = [{word, reason:'wrong'|'near', id}]
+let focusWords = [];
 
-// Adaptive pool: weighted random
 let wordPool = [];
+let poolIndex = 0;
 
-// TTS
-let voices = [];
-let speechReady = false;
-let currentUtterance = null;
+// ══════════════════════════════════════════
+//  TRANSLATIONS
+// ══════════════════════════════════════════
+const T = {
+  en: {
+    headerTitle:'Spelling Bee', headerSub:'Spanish Spelling Bee',
+    startTitle:'Welcome to Spelling Bee!',
+    startDesc:'Listen to each Spanish word, type it correctly with accent marks, and improve your score. Harder words appear more often!',
+    practiceDescTxt:'Practice mode: first-letter hint and retry. Perfect for studying.',
+    beeDescTxt:'Competition mode: no hints. Just like the real spelling bee.',
+    tabPractice:'Practice', tabBee:'Bee Mode',
+    startBtn:'🐝 Start', wordCountBadge:'1,070 words · adaptive',
+    roundModePractice:'PRACTICE MODE', roundModeBee:'BEE MODE',
+    wordNumLabel: n => `Word #${n}`,
+    speakBtn:'Listen to word', slowBtn:'Slow', repeatBtn:'Repeat', nextBtn:'Skip',
+    hintFirst:'First letter', answerLbl:'Type the word:',
+    checkBtn:'✓ Check', menuBtn:'Menu', giveUpLbl:'Show answer',
+    statCorrect:'Correct', statWrong:'Wrong', statStreak:'Streak', statTotal:'Total',
+    feedbackCorrect:'Correct!',
+    feedbackNear:'Almost! Check the accents.',
+    feedbackWrong:'Not quite. The correct word is:',
+    feedbackGaveUp:'The correct word is:',
+    focusTitle:'📋 Parent Focus List', downloadLbl:'Download CSV',
+    firstLetterHint: l => `First letter: ${l.toUpperCase()}`,
+    reviewNavLbl:'Review',
+    reviewTitle:'📋 Words to Review',
+    reviewDesc:'All words he has struggled with, sorted by most errors first. Saved across sessions.',
+    rvWrongLbl:'Spelling Errors', rvNearLbl:'Accent Errors', rvMasteredLbl:'Mastered',
+    rvDownloadLbl:'Download CSV', rvClearLbl:'Clear History', rvBackLbl:'← Back',
+    ftAll:'All', ftWrong:'Spelling', ftNear:'Accents', ftMastered:'Mastered',
+    thWord:'Word', thStatus:'Status',
+    masteryLvl:['New','Learning','Getting there','Mastered'],
+    savedBanner: (w,c,s) => `📊 Saved progress: ${w} words seen, ${c} correct, ${s} streak. Tap Start to continue.`,
+    confirmClear:'Clear all saved history? This cannot be undone.',
+    noWordsYet:'No words here yet — start practicing!',
+  },
+  es: {
+    headerTitle:'Spelling Bee', headerSub:'Concurso de Ortografía',
+    startTitle:'¡Bienvenido al Spelling Bee!',
+    startDesc:'Escucha cada palabra en español, escríbela correctamente con los acentos, y mejora tu puntuación.',
+    practiceDescTxt:'Modo práctica: pista de primera letra y reintento. Perfecto para estudiar.',
+    beeDescTxt:'Modo competencia: sin pistas. Igual que el concurso real.',
+    tabPractice:'Práctica', tabBee:'Concurso',
+    startBtn:'🐝 Comenzar', wordCountBadge:'1,070 palabras · adaptivo',
+    roundModePractice:'MODO PRÁCTICA', roundModeBee:'MODO CONCURSO',
+    wordNumLabel: n => `Palabra #${n}`,
+    speakBtn:'Escuchar palabra', slowBtn:'Lento', repeatBtn:'Repetir', nextBtn:'Siguiente',
+    hintFirst:'Primera letra', answerLbl:'Escribe la palabra:',
+    checkBtn:'✓ Verificar', menuBtn:'Menú', giveUpLbl:'Ver respuesta',
+    statCorrect:'Correctas', statWrong:'Errores', statStreak:'Racha', statTotal:'Total',
+    feedbackCorrect:'¡Correcto!',
+    feedbackNear:'¡Casi! Revisa los acentos.',
+    feedbackWrong:'No es correcta. La palabra es:',
+    feedbackGaveUp:'La palabra correcta es:',
+    focusTitle:'📋 Lista para padres', downloadLbl:'Descargar CSV',
+    firstLetterHint: l => `Primera letra: ${l.toUpperCase()}`,
+    reviewNavLbl:'Revisar',
+    reviewTitle:'📋 Palabras a Repasar',
+    reviewDesc:'Todas las palabras con errores, ordenadas por más errores. Guardadas entre sesiones.',
+    rvWrongLbl:'Errores de ortografía', rvNearLbl:'Errores de acento', rvMasteredLbl:'Dominadas',
+    rvDownloadLbl:'Descargar CSV', rvClearLbl:'Borrar historial', rvBackLbl:'← Volver',
+    ftAll:'Todas', ftWrong:'Ortografía', ftNear:'Acentos', ftMastered:'Dominadas',
+    thWord:'Palabra', thStatus:'Estado',
+    masteryLvl:['Nueva','Aprendiendo','En progreso','Dominada'],
+    savedBanner: (w,c,s) => `📊 Progreso guardado: ${w} palabras, ${c} correctas, racha ${s}. Toca Comenzar para continuar.`,
+    confirmClear:'¿Borrar todo el historial? No se puede deshacer.',
+    noWordsYet:'¡Sin palabras aún — empieza a practicar!',
+  }
+};
+
+function t(key, ...args) {
+  const tr = T[lang][key];
+  if (typeof tr === 'function') return tr(...args);
+  return tr !== undefined ? tr : (T.en[key] || key);
+}
 
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
 function init() {
-  loadMastery();
+  loadFromStorage();
   buildPool();
   loadVoices();
-  
-  // Also try loading voices after interaction — Safari quirk
-  window.speechSynthesis.onvoiceschanged = () => {
-    voices = window.speechSynthesis.getVoices();
-    speechReady = voices.length > 0;
-  };
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  renderUI();
+  updateReviewBadge();
+  showSavedBanner();
 }
 
-function loadVoices() {
-  voices = window.speechSynthesis.getVoices();
-  speechReady = voices.length > 0;
-}
-
-function buildPool() {
-  // Weighted: lower score words appear more often
-  wordPool = [];
-  WORDS.forEach(w => {
-    const m = masteryMap[w.id] || { correct: 0, wrong: 0, nearMiss: 0, score: 0 };
-    const score = m.score || 0;
-    // Weight: 4 slots for score 0, 3 for 1, 2 for 2, 1 for 3
-    const weight = Math.max(1, 4 - score);
-    for (let i = 0; i < weight; i++) wordPool.push(w);
-  });
-  // Shuffle
-  for (let i = wordPool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [wordPool[i], wordPool[j]] = [wordPool[j], wordPool[i]];
-  }
-}
-
-function loadMastery() {
-  try {
-    const saved = sessionStorage.getItem('spelling_mastery');
-    if (saved) masteryMap = JSON.parse(saved);
-  } catch(e) { masteryMap = {}; }
-}
-
-function saveMastery() {
-  try {
-    sessionStorage.setItem('spelling_mastery', JSON.stringify(masteryMap));
-  } catch(e) {}
+function showSavedBanner() {
+  const totalSeen = Object.values(masteryMap).filter(m => m.correct + m.wrong > 0).length;
+  if (totalSeen === 0) return;
+  const totalCorrect = Object.values(masteryMap).reduce((a,m) => a + m.correct, 0);
+  const bestStreakSaved = Object.values(masteryMap).reduce((a,m) => Math.max(a, m.correct), 0);
+  const banner = document.getElementById('session-banner');
+  banner.textContent = t('savedBanner', totalSeen, totalCorrect, bestStreakSaved);
+  banner.classList.add('visible');
+  document.getElementById('banner-spacer').classList.remove('hidden');
 }
 
 // ══════════════════════════════════════════
 //  LANGUAGE
 // ══════════════════════════════════════════
-const T = {
-  en: {
-    headerTitle: 'Spelling Bee',
-    headerSub: 'Spanish Spelling Bee',
-    startTitle: 'Welcome to Spelling Bee!',
-    startDesc: 'Listen to each Spanish word, type it correctly with accent marks, and improve your score. Harder words appear more often!',
-    practiceDescTxt: 'Practice mode: first-letter hint, optional clues, and retry. Perfect for studying.',
-    beeDescTxt: 'Competition mode: no hints. Just like the real spelling bee.',
-    tabPractice: 'Practice',
-    tabBee: 'Bee Mode',
-    startBtn: '🐝 Start',
-    wordCountBadge: '1,070 words · adaptive',
-    roundModePractice: 'PRACTICE MODE',
-    roundModeBee: 'BEE MODE',
-    wordNumLabel: (n) => `Word #${n}`,
-    speakBtn: 'Listen to word',
-    slowBtn: 'Slow',
-    repeatBtn: 'Repeat',
-    nextBtn: 'Skip',
-    hintFirst: 'First letter',
-    answerLbl: 'Type the word:',
-    checkBtn: '✓ Check',
-    menuBtn: 'Menu',
-    giveUpLbl: 'Show answer',
-    statCorrect: 'Correct',
-    statWrong: 'Wrong',
-    statStreak: 'Streak',
-    statTotal: 'Total',
-    feedbackCorrect: 'Correct!',
-    feedbackNear: 'Almost! Check the accents.',
-    feedbackWrong: 'Not quite. The correct word is:',
-    feedbackGaveUp: 'The correct word is:',
-    focusTitle: '📋 Parent Focus List',
-    downloadLbl: 'Download CSV',
-    firstLetterHint: (l) => `First letter: ${l.toUpperCase()}`,
-    needToHear: 'Tap "Listen to word" first',
-    alreadyAnswered: 'Tap "Skip" or wait for next word',
-    masteryLvl: ['Not started', 'Learning', 'Getting there', 'Mastered'],
-  },
-  es: {
-    headerTitle: 'Spelling Bee',
-    headerSub: 'Concurso de Ortografía',
-    startTitle: '¡Bienvenido al Spelling Bee!',
-    startDesc: 'Escucha cada palabra en español, escríbela correctamente con los acentos, y mejora tu puntuación. ¡Las palabras difíciles aparecen más seguido!',
-    practiceDescTxt: 'Modo práctica: pista de primera letra y reintento. Perfecto para estudiar.',
-    beeDescTxt: 'Modo competencia: sin pistas. Igual que el concurso real.',
-    tabPractice: 'Práctica',
-    tabBee: 'Concurso',
-    startBtn: '🐝 Comenzar',
-    wordCountBadge: '1,070 palabras · adaptivo',
-    roundModePractice: 'MODO PRÁCTICA',
-    roundModeBee: 'MODO CONCURSO',
-    wordNumLabel: (n) => `Palabra #${n}`,
-    speakBtn: 'Escuchar palabra',
-    slowBtn: 'Lento',
-    repeatBtn: 'Repetir',
-    nextBtn: 'Siguiente',
-    hintFirst: 'Primera letra',
-    answerLbl: 'Escribe la palabra:',
-    checkBtn: '✓ Verificar',
-    menuBtn: 'Menú',
-    giveUpLbl: 'Ver respuesta',
-    statCorrect: 'Correctas',
-    statWrong: 'Errores',
-    statStreak: 'Racha',
-    statTotal: 'Total',
-    feedbackCorrect: '¡Correcto!',
-    feedbackNear: '¡Casi! Revisa los acentos.',
-    feedbackWrong: 'No es correcta. La palabra es:',
-    feedbackGaveUp: 'La palabra correcta es:',
-    focusTitle: '📋 Lista para padres',
-    downloadLbl: 'Descargar CSV',
-    firstLetterHint: (l) => `Primera letra: ${l.toUpperCase()}`,
-    needToHear: 'Toca "Escuchar palabra" primero',
-    alreadyAnswered: 'Toca "Siguiente" para continuar',
-    masteryLvl: ['Sin empezar', 'Aprendiendo', 'En progreso', 'Dominada'],
-  }
-};
-
-function t(key, arg) {
-  const tr = T[lang][key];
-  if (typeof tr === 'function') return tr(arg);
-  return tr || T.en[key];
-}
-
 function setLang(l) {
   lang = l;
-  document.getElementById('lang-en').classList.toggle('active', l === 'en');
-  document.getElementById('lang-es').classList.toggle('active', l === 'es');
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-es').classList.toggle('active', l==='es');
   renderUI();
+  if (document.getElementById('page-review').classList.contains('active')) renderReviewTable();
 }
 
 function renderUI() {
-  const keys = [
-    ['header-title', 'headerTitle'],
-    ['header-sub', 'headerSub'],
-    ['start-title', 'startTitle'],
-    ['start-desc', 'startDesc'],
-    ['practice-desc-txt', 'practiceDescTxt'],
-    ['tab-practice-lbl', 'tabPractice'],
-    ['tab-bee-lbl', 'tabBee'],
-    ['start-btn-lbl', 'startBtn'],
-    ['word-count-badge', 'wordCountBadge'],
-    ['speak-btn-lbl', 'speakBtn'],
-    ['slow-btn-lbl', 'slowBtn'],
-    ['repeat-btn-lbl', 'repeatBtn'],
-    ['next-btn-lbl', 'nextBtn'],
-    ['hint-first-lbl', 'hintFirst'],
-    ['answer-lbl', 'answerLbl'],
-    ['check-btn-lbl', 'checkBtn'],
-    ['menu-btn-lbl', 'menuBtn'],
-    ['give-up-lbl', 'giveUpLbl'],
-    ['stat-correct-lbl', 'statCorrect'],
-    ['stat-wrong-lbl', 'statWrong'],
-    ['stat-streak-lbl', 'statStreak'],
-    ['stat-total-lbl', 'statTotal'],
-    ['focus-title', 'focusTitle'],
-    ['download-lbl', 'downloadLbl'],
+  const map = [
+    ['header-title','headerTitle'],['header-sub','headerSub'],
+    ['start-title','startTitle'],['start-desc','startDesc'],
+    ['tab-practice-lbl','tabPractice'],['tab-bee-lbl','tabBee'],
+    ['start-btn-lbl','startBtn'],['word-count-badge','wordCountBadge'],
+    ['speak-btn-lbl','speakBtn'],['slow-btn-lbl','slowBtn'],
+    ['repeat-btn-lbl','repeatBtn'],['next-btn-lbl','nextBtn'],
+    ['hint-first-lbl','hintFirst'],['answer-lbl','answerLbl'],
+    ['check-btn-lbl','checkBtn'],['menu-btn-lbl','menuBtn'],
+    ['give-up-lbl','giveUpLbl'],
+    ['stat-correct-lbl','statCorrect'],['stat-wrong-lbl','statWrong'],
+    ['stat-streak-lbl','statStreak'],['stat-total-lbl','statTotal'],
+    ['focus-title','focusTitle'],['download-lbl','downloadLbl'],
+    ['review-nav-lbl','reviewNavLbl'],
+    ['review-title','reviewTitle'],['review-desc','reviewDesc'],
+    ['rv-wrong-lbl','rvWrongLbl'],['rv-near-lbl','rvNearLbl'],
+    ['rv-mastered-lbl','rvMasteredLbl'],['rv-download-lbl','rvDownloadLbl'],
+    ['rv-clear-lbl','rvClearLbl'],['rv-back-lbl','rvBackLbl'],
+    ['ft-all-lbl','ftAll'],['ft-wrong-lbl','ftWrong'],
+    ['ft-near-lbl','ftNear'],['ft-mastered-lbl','ftMastered'],
+    ['th-word','thWord'],['th-status','thStatus'],
   ];
-
-  keys.forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = t(key);
-  });
-
+  map.forEach(([id,key]) => { const el=document.getElementById(id); if(el) el.textContent=t(key); });
+  document.getElementById('practice-desc-txt').textContent =
+    mode==='bee' ? t('beeDescTxt') : t('practiceDescTxt');
   if (sessionStarted && currentWord) {
-    document.getElementById('round-mode-label').textContent = 
-      mode === 'practice' ? t('roundModePractice') : t('roundModeBee');
+    document.getElementById('round-mode-label').textContent =
+      mode==='practice' ? t('roundModePractice') : t('roundModeBee');
     document.getElementById('word-num-label').textContent = t('wordNumLabel', total);
-    if (mode === 'practice') {
-      document.getElementById('first-letter-hint').textContent = 
-        t('firstLetterHint', currentWord.word[0]);
-    }
   }
-  if (mode === 'bee') {
-    document.getElementById('practice-desc-txt').textContent = t('beeDescTxt');
-  } else {
-    document.getElementById('practice-desc-txt').textContent = t('practiceDescTxt');
-  }
+}
+
+// ══════════════════════════════════════════
+//  PAGE NAVIGATION
+// ══════════════════════════════════════════
+function showReviewPage() {
+  document.getElementById('page-game').classList.remove('active');
+  document.getElementById('page-review').classList.add('active');
+  renderReviewPage();
+}
+
+function showGamePage() {
+  document.getElementById('page-review').classList.remove('active');
+  document.getElementById('page-game').classList.add('active');
 }
 
 // ══════════════════════════════════════════
@@ -1104,456 +672,416 @@ function renderUI() {
 // ══════════════════════════════════════════
 function setMode(m) {
   mode = m;
-  document.getElementById('tab-practice').classList.toggle('active', m === 'practice');
-  document.getElementById('tab-bee').classList.toggle('active', m === 'bee');
+  document.getElementById('tab-practice').classList.toggle('active', m==='practice');
+  document.getElementById('tab-bee').classList.toggle('active', m==='bee');
   renderUI();
 }
 
 // ══════════════════════════════════════════
-//  START
+//  ADAPTIVE POOL
+// ══════════════════════════════════════════
+function buildPool() {
+  wordPool = [];
+  WORDS.forEach(w => {
+    const m = masteryMap[w.id] || {correct:0,wrong:0,nearMiss:0,score:0};
+    const weight = Math.max(1, 4 - (m.score||0));
+    for (let i=0; i<weight; i++) wordPool.push(w);
+  });
+  for (let i=wordPool.length-1; i>0; i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [wordPool[i],wordPool[j]]=[wordPool[j],wordPool[i]];
+  }
+}
+
+// ══════════════════════════════════════════
+//  SPEECH
+// ══════════════════════════════════════════
+let voices = [];
+function loadVoices() { voices = window.speechSynthesis.getVoices(); }
+
+function getSpanishVoice() {
+  const all = window.speechSynthesis.getVoices();
+  return all.find(v=>v.lang==='es-US') || all.find(v=>v.lang==='es-MX') ||
+         all.find(v=>v.lang==='es-419') || all.find(v=>v.lang==='es-ES') ||
+         all.find(v=>v.lang.startsWith('es')) || null;
+}
+
+function speakWordSlow() { speakWord(true); }
+
+function speakWord(slow=false) {
+  if (!currentWord) return;
+  try { window.speechSynthesis.cancel(); } catch(e) {}
+  const phrases = mode==='bee'
+    ? [`La palabra es: ${currentWord.word}`, currentWord.word]
+    : [currentWord.word];
+  let idx=0;
+  const speakNext = () => {
+    if (idx>=phrases.length) {
+      wordHeard=true;
+      document.getElementById('speak-btn').classList.remove('speaking');
+      document.getElementById('slow-btn').disabled=false;
+      document.getElementById('repeat-btn').disabled=false;
+      document.getElementById('answer-input').focus();
+      return;
+    }
+    const utt=new SpeechSynthesisUtterance(phrases[idx++]);
+    const voice=getSpanishVoice();
+    if(voice) utt.voice=voice;
+    utt.lang='es-US'; utt.rate=slow?0.6:0.85; utt.pitch=1.0; utt.volume=1.0;
+    utt.onend=speakNext; utt.onerror=speakNext;
+    setTimeout(()=>{ try{window.speechSynthesis.speak(utt);}catch(e){} }, idx===1?0:400);
+  };
+  document.getElementById('speak-btn').classList.add('speaking');
+  speakNext();
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden && window.speechSynthesis.paused) window.speechSynthesis.resume();
+});
+
+// ══════════════════════════════════════════
+//  START / RETURN
 // ══════════════════════════════════════════
 function startPractice() {
-  // Unlock audio context for Safari (must happen inside user gesture)
-  try {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-  } catch(e) {}
-  
-  // Load voices now — Safari sometimes only has them after user gesture
+  try { window.speechSynthesis.cancel(); } catch(e) {}
   loadVoices();
-
-  sessionStarted = true;
+  sessionStarted=true;
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-area').classList.remove('hidden');
-  
   updateStats();
   nextWord();
 }
 
 function returnToMenu() {
   window.speechSynthesis.cancel();
-  sessionStarted = false;
-  currentWord = null;
-  wordHeard = false;
-  answered = false;
-  
+  sessionStarted=false; currentWord=null; wordHeard=false; answered=false;
+  correct=0; wrong=0; streak=0; total=0; streakHistory=[];
   document.getElementById('start-screen').classList.remove('hidden');
   document.getElementById('game-area').classList.add('hidden');
-  
-  // Reset UI
-  document.getElementById('answer-input').value = '';
-  document.getElementById('answer-input').className = 'answer-input';
+  document.getElementById('answer-input').value='';
+  document.getElementById('answer-input').className='answer-input';
   hideFeedback();
+  showSavedBanner();
+  updateReviewBadge();
   renderUI();
 }
 
 // ══════════════════════════════════════════
-//  WORD SELECTION
+//  NEXT WORD
 // ══════════════════════════════════════════
-let poolIndex = 0;
-
 function nextWord() {
-  answered = false;
-  gaveUp = false;
-  wordHeard = false;
-
-  // Pick next word from pool
-  if (poolIndex >= wordPool.length) {
-    poolIndex = 0;
-    buildPool(); // Rebuild with updated mastery
-  }
-  currentWord = wordPool[poolIndex++];
+  answered=false; wordHeard=false;
+  if (poolIndex>=wordPool.length) { poolIndex=0; buildPool(); }
+  currentWord=wordPool[poolIndex++];
   total++;
-
-  // Reset input
-  const inp = document.getElementById('answer-input');
-  inp.value = '';
-  inp.className = 'answer-input';
-  inp.disabled = false;
-
-  hideFeedback();
-  resetFirstLetterHint();
-
-  // Update labels
-  document.getElementById('round-mode-label').textContent = 
-    mode === 'practice' ? t('roundModePractice') : t('roundModeBee');
-  document.getElementById('word-num-label').textContent = t('wordNumLabel', total);
-
-  // Buttons
-  document.getElementById('speak-btn').disabled = false;
-  document.getElementById('slow-btn').disabled = true;
-  document.getElementById('repeat-btn').disabled = true;
-  document.getElementById('check-btn').disabled = false;
-  document.getElementById('next-btn').disabled = false;
-  document.getElementById('give-up-btn').style.display = 
-    mode === 'practice' ? 'block' : 'none';
-
-  // Show/hide clues
-  const clueSection = document.getElementById('clue-section');
-  clueSection.style.display = mode === 'practice' ? '' : 'none';
-
-  // Auto-speak after a short delay
-  setTimeout(() => { speakWord(); }, 300);
-
+  const inp=document.getElementById('answer-input');
+  inp.value=''; inp.className='answer-input'; inp.disabled=false;
+  hideFeedback(); resetFirstLetterHint();
+  document.getElementById('round-mode-label').textContent=
+    mode==='practice'?t('roundModePractice'):t('roundModeBee');
+  document.getElementById('word-num-label').textContent=t('wordNumLabel',total);
+  document.getElementById('speak-btn').disabled=false;
+  document.getElementById('slow-btn').disabled=true;
+  document.getElementById('repeat-btn').disabled=true;
+  document.getElementById('check-btn').disabled=false;
+  document.getElementById('next-btn').disabled=false;
+  document.getElementById('give-up-btn').style.display=mode==='practice'?'block':'none';
+  document.getElementById('clue-section').style.display=mode==='practice'?'':'none';
   updateStats();
+  setTimeout(()=>{ speakWord(); }, 300);
 }
 
 // ══════════════════════════════════════════
-//  SPEECH
-// ══════════════════════════════════════════
-function getSpanishVoice() {
-  // Prefer es-US, then es-ES, then any es-* voice
-  const all = window.speechSynthesis.getVoices();
-  if (!all.length) return null;
-  
-  return (
-    all.find(v => v.lang === 'es-US') ||
-    all.find(v => v.lang === 'es-MX') ||
-    all.find(v => v.lang === 'es-419') ||
-    all.find(v => v.lang === 'es-ES') ||
-    all.find(v => v.lang.startsWith('es')) ||
-    null
-  );
-}
-
-function speakWordSlow() { speakWord(true); }
-
-function speakWord(slow = false) {
-  if (!currentWord) return;
-  
-  // Cancel any ongoing speech
-  try { window.speechSynthesis.cancel(); } catch(e) {}
-
-  const word = currentWord.word;
-  
-  // Safari iOS: wrap in bee announcement
-  const phrases = mode === 'bee'
-    ? [`La palabra es: ${word}`, word]
-    : [word];
-  
-  let idx = 0;
-  
-  const speakNext = () => {
-    if (idx >= phrases.length) {
-      // Done
-      wordHeard = true;
-      document.getElementById('speak-btn').classList.remove('speaking');
-      document.getElementById('slow-btn').disabled = false;
-      document.getElementById('repeat-btn').disabled = false;
-      document.getElementById('answer-input').focus();
-      return;
-    }
-    
-    const utt = new SpeechSynthesisUtterance(phrases[idx++]);
-    const voice = getSpanishVoice();
-    if (voice) utt.voice = voice;
-    utt.lang = 'es-US';
-    utt.rate = slow ? 0.6 : 0.85;
-    utt.pitch = 1.0;
-    utt.volume = 1.0;
-    
-    utt.onend = speakNext;
-    utt.onerror = speakNext;
-    
-    currentUtterance = utt;
-    
-    // Safari requires a slight delay between utterances
-    setTimeout(() => {
-      try { window.speechSynthesis.speak(utt); } catch(e) {}
-    }, idx === 1 ? 0 : 400);
-  };
-  
-  document.getElementById('speak-btn').classList.add('speaking');
-  speakNext();
-}
-
-// Safari iOS sometimes pauses speech synthesis when the page is backgrounded.
-// Resume on visibility change.
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && window.speechSynthesis.paused) {
-    window.speechSynthesis.resume();
-  }
-});
-
-// ══════════════════════════════════════════
-//  ANSWER INPUT
+//  INPUT
 // ══════════════════════════════════════════
 function insertChar(ch) {
-  const inp = document.getElementById('answer-input');
-  const start = inp.selectionStart;
-  const end = inp.selectionEnd;
-  inp.value = inp.value.slice(0, start) + ch + inp.value.slice(end);
-  inp.selectionStart = inp.selectionEnd = start + ch.length;
+  const inp=document.getElementById('answer-input');
+  const s=inp.selectionStart, e=inp.selectionEnd;
+  inp.value=inp.value.slice(0,s)+ch+inp.value.slice(e);
+  inp.selectionStart=inp.selectionEnd=s+ch.length;
   inp.focus();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('answer-input').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (!answered) checkAnswer();
-      else skipWord();
-    }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('answer-input').addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'){ ev.preventDefault(); if(!answered) checkAnswer(); else skipWord(); }
   });
 });
 
 // ══════════════════════════════════════════
 //  CHECK ANSWER
 // ══════════════════════════════════════════
-function normalize(str) {
-  return str.trim().toLowerCase();
-}
-
-function normalizeNoAccents(str) {
-  return normalize(str)
-    .replace(/[áà]/g, 'a')
-    .replace(/[éè]/g, 'e')
-    .replace(/[íì]/g, 'i')
-    .replace(/[óò]/g, 'o')
-    .replace(/[úùü]/g, 'u')
-    .replace(/ñ/g, 'n');
+function normalize(s){ return s.trim().toLowerCase(); }
+function noAccents(s){
+  return normalize(s)
+    .replace(/[áà]/g,'a').replace(/[éè]/g,'e').replace(/[íì]/g,'i')
+    .replace(/[óò]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n');
 }
 
 function checkAnswer() {
-  if (!currentWord || answered) return;
-  
-  const inp = document.getElementById('answer-input');
-  const given = inp.value;
-  
-  if (!given.trim()) return;
-  if (!wordHeard && mode === 'bee') {
-    showFeedback('near', t('needToHear'), '');
-    return;
-  }
-  
-  const correct_word = currentWord.word;
-  const givenN = normalize(given);
-  const correctN = normalize(correct_word);
-  
-  answered = true;
-  inp.disabled = true;
-  document.getElementById('check-btn').disabled = true;
+  if (!currentWord||answered) return;
+  const inp=document.getElementById('answer-input');
+  if (!inp.value.trim()) return;
+  answered=true; inp.disabled=true;
+  document.getElementById('check-btn').disabled=true;
 
-  const exactMatch = givenN === correctN;
-  const noAccentMatch = normalizeNoAccents(givenN) === normalizeNoAccents(correctN);
-  
-  let m = masteryMap[currentWord.id];
-  if (!m) m = masteryMap[currentWord.id] = { correct: 0, wrong: 0, nearMiss: 0, score: 0 };
+  const given=normalize(inp.value);
+  const correct_word=currentWord.word;
+  const correctN=normalize(correct_word);
+  const exactMatch=given===correctN;
+  const nearMatch=!exactMatch && noAccents(given)===noAccents(correctN);
+
+  let m=masteryMap[currentWord.id];
+  if(!m) m=masteryMap[currentWord.id]={correct:0,wrong:0,nearMiss:0,score:0};
 
   if (exactMatch) {
-    // Correct!
-    correct++;
-    streak++;
-    if (streak > bestStreak) bestStreak = streak;
+    correct++; streak++;
     streakHistory.push(true);
     m.correct++;
-    m.score = Math.min(3, Math.floor(m.correct / 2));
-    
-    inp.classList.add('correct');
-    inp.classList.add('pop');
-    showFeedback('correct', t('feedbackCorrect'), '');
-    
-    // Remove from focus list if present
-    focusWords = focusWords.filter(fw => fw.word !== correct_word);
-    
-  } else if (noAccentMatch) {
-    // Near miss — wrong accents
-    wrong++;
-    streak = 0;
+    m.score=Math.min(3, Math.floor(m.correct/2));
+    // Remove from focus list if mastered
+    if (m.score>=3) focusWords=focusWords.filter(fw=>fw.id!==currentWord.id);
+    inp.classList.add('correct','pop');
+    showFeedback('correct',t('feedbackCorrect'),'');
+    setTimeout(()=>{ if(answered) nextWord(); }, 2000);
+  } else if (nearMatch) {
+    wrong++; streak=0;
     streakHistory.push(false);
-    m.nearMiss++;
-    m.wrong++;
-    m.score = Math.max(0, m.score - 0.5 | 0);
-    
-    inp.classList.add('wrong');
-    inp.classList.add('shake');
-    showFeedback('near', t('feedbackNear'), correct_word);
-    
-    if (!focusWords.find(fw => fw.word === correct_word)) {
-      focusWords.push({ word: correct_word, reason: 'near' });
-    }
-    
+    m.nearMiss++; m.wrong++;
+    m.score=Math.max(0,(m.score||0)-0.5|0);
+    inp.classList.add('wrong','shake');
+    showFeedback('near',t('feedbackNear'),correct_word);
+    upsertFocusWord(currentWord,'near');
+    speakCorrectAfterDelay(correct_word);
   } else {
-    // Wrong
-    wrong++;
-    streak = 0;
+    wrong++; streak=0;
     streakHistory.push(false);
     m.wrong++;
-    m.score = Math.max(0, m.score - 1);
-    
-    inp.classList.add('wrong');
-    inp.classList.add('shake');
-    showFeedback('wrong', t('feedbackWrong'), correct_word);
-    
-    if (!focusWords.find(fw => fw.word === correct_word)) {
-      focusWords.push({ word: correct_word, reason: 'wrong' });
-    }
+    m.score=Math.max(0,(m.score||0)-1);
+    inp.classList.add('wrong','shake');
+    showFeedback('wrong',t('feedbackWrong'),correct_word);
+    upsertFocusWord(currentWord,'wrong');
+    speakCorrectAfterDelay(correct_word);
   }
 
-  if (streakHistory.length > 10) streakHistory.shift();
-  saveMastery();
+  if(streakHistory.length>10) streakHistory.shift();
+  saveToStorage();
   updateStats();
   renderFocusList();
-  
-  // Speak the correct word after a miss (bee mode: always; practice: yes)
-  if (!exactMatch) {
-    setTimeout(() => {
-      const utt = new SpeechSynthesisUtterance(correct_word);
-      const voice = getSpanishVoice();
-      if (voice) utt.voice = voice;
-      utt.lang = 'es-US';
-      utt.rate = 0.8;
-      window.speechSynthesis.speak(utt);
-    }, 600);
-  }
+  updateReviewBadge();
+}
 
-  // Auto-advance after 2.5s for correct, stay for wrong (so student can see answer)
-  if (exactMatch) {
-    setTimeout(() => {
-      if (answered) nextWord();
-    }, 2000);
+function upsertFocusWord(word, reason) {
+  const existing = focusWords.find(fw=>fw.id===word.id);
+  if (existing) {
+    // Upgrade 'near' to 'wrong' if newly wrong
+    if (reason==='wrong') existing.reason='wrong';
+  } else {
+    focusWords.push({id:word.id, word:word.word, reason});
   }
 }
 
 function giveUp() {
-  if (!currentWord || answered) return;
-  gaveUp = true;
-  answered = true;
-  
-  const inp = document.getElementById('answer-input');
-  inp.value = currentWord.word;
-  inp.disabled = true;
-  inp.classList.add('wrong');
-  
-  document.getElementById('check-btn').disabled = true;
-  
-  wrong++;
-  streak = 0;
-  streakHistory.push(false);
-  if (streakHistory.length > 10) streakHistory.shift();
-  
-  let m = masteryMap[currentWord.id];
-  if (!m) m = masteryMap[currentWord.id] = { correct: 0, wrong: 0, nearMiss: 0, score: 0 };
-  m.wrong++;
-  m.score = Math.max(0, m.score - 1);
-  
-  if (!focusWords.find(fw => fw.word === currentWord.word)) {
-    focusWords.push({ word: currentWord.word, reason: 'wrong' });
-  }
-  
-  showFeedback('wrong', t('feedbackGaveUp'), currentWord.word);
-  saveMastery();
-  updateStats();
-  renderFocusList();
-  
-  // Speak the word
-  setTimeout(() => {
-    const utt = new SpeechSynthesisUtterance(currentWord.word);
-    const voice = getSpanishVoice();
-    if (voice) utt.voice = voice;
-    utt.lang = 'es-US';
-    utt.rate = 0.8;
-    window.speechSynthesis.speak(utt);
-  }, 400);
+  if(!currentWord||answered) return;
+  answered=true;
+  const inp=document.getElementById('answer-input');
+  inp.value=currentWord.word; inp.disabled=true; inp.classList.add('wrong');
+  document.getElementById('check-btn').disabled=true;
+  wrong++; streak=0; streakHistory.push(false);
+  if(streakHistory.length>10) streakHistory.shift();
+  let m=masteryMap[currentWord.id];
+  if(!m) m=masteryMap[currentWord.id]={correct:0,wrong:0,nearMiss:0,score:0};
+  m.wrong++; m.score=Math.max(0,(m.score||0)-1);
+  upsertFocusWord(currentWord,'wrong');
+  showFeedback('wrong',t('feedbackGaveUp'),currentWord.word);
+  saveToStorage(); updateStats(); renderFocusList(); updateReviewBadge();
+  speakCorrectAfterDelay(currentWord.word);
 }
 
-function skipWord() {
-  if (answered) nextWord();
+function speakCorrectAfterDelay(word) {
+  setTimeout(()=>{
+    const utt=new SpeechSynthesisUtterance(word);
+    const v=getSpanishVoice(); if(v) utt.voice=v;
+    utt.lang='es-US'; utt.rate=0.8;
+    window.speechSynthesis.speak(utt);
+  }, 600);
 }
+
+function skipWord() { if(answered) nextWord(); }
 
 // ══════════════════════════════════════════
-//  HINTS (Practice Mode only)
+//  HINTS
 // ══════════════════════════════════════════
 function resetFirstLetterHint() {
-  const hint = document.getElementById('first-letter-hint');
-  hint.classList.remove('visible');
-  hint.textContent = '';
+  document.getElementById('first-letter-hint').classList.remove('visible');
+  document.getElementById('first-letter-hint').textContent='';
   document.getElementById('hint-first-btn').classList.remove('active');
 }
-
 function toggleFirstLetter() {
-  if (!currentWord || mode === 'bee') return;
-  const hint = document.getElementById('first-letter-hint');
-  const btn = document.getElementById('hint-first-btn');
-  const showing = hint.classList.contains('visible');
-  if (showing) {
-    hint.classList.remove('visible');
-    btn.classList.remove('active');
-  } else {
-    hint.textContent = t('firstLetterHint', currentWord.word[0]);
-    hint.classList.add('visible');
-    btn.classList.add('active');
-  }
+  if(!currentWord||mode==='bee') return;
+  const hint=document.getElementById('first-letter-hint');
+  const btn=document.getElementById('hint-first-btn');
+  if(hint.classList.contains('visible')){ hint.classList.remove('visible'); btn.classList.remove('active'); }
+  else { hint.textContent=t('firstLetterHint',currentWord.word[0]); hint.classList.add('visible'); btn.classList.add('active'); }
 }
 
 // ══════════════════════════════════════════
 //  FEEDBACK
 // ══════════════════════════════════════════
-function showFeedback(type, msg, word) {
-  const fb = document.getElementById('feedback');
-  fb.className = `feedback visible ${type}`;
-  document.getElementById('feedback-icon').textContent = 
-    type === 'correct' ? '✅' : type === 'near' ? '⚠️' : '❌';
-  document.getElementById('feedback-msg').textContent = msg;
-  document.getElementById('feedback-word').textContent = word;
+function showFeedback(type,msg,word) {
+  const fb=document.getElementById('feedback');
+  fb.className=`feedback visible ${type}`;
+  document.getElementById('feedback-icon').textContent=type==='correct'?'✅':type==='near'?'⚠️':'❌';
+  document.getElementById('feedback-msg').textContent=msg;
+  document.getElementById('feedback-word').textContent=word;
 }
-
-function hideFeedback() {
-  document.getElementById('feedback').className = 'feedback';
-}
+function hideFeedback(){ document.getElementById('feedback').className='feedback'; }
 
 // ══════════════════════════════════════════
 //  STATS
 // ══════════════════════════════════════════
 function updateStats() {
-  document.getElementById('stat-correct').textContent = correct;
-  document.getElementById('stat-wrong').textContent = wrong;
-  document.getElementById('stat-streak').textContent = streak;
-  document.getElementById('stat-total').textContent = total - 1; // exclude current
-  
-  // Streak dots
-  const dotsEl = document.getElementById('streak-dots');
-  dotsEl.innerHTML = streakHistory.map(h => 
-    `<div class="streak-dot ${h ? 'hit' : 'miss'}"></div>`
-  ).join('');
+  document.getElementById('stat-correct').textContent=correct;
+  document.getElementById('stat-wrong').textContent=wrong;
+  document.getElementById('stat-streak').textContent=streak;
+  document.getElementById('stat-total').textContent=Math.max(0,total-1);
+  document.getElementById('streak-dots').innerHTML=
+    streakHistory.map(h=>`<div class="streak-dot ${h?'hit':'miss'}"></div>`).join('');
 }
 
 // ══════════════════════════════════════════
-//  FOCUS LIST
+//  IN-SESSION FOCUS LIST
 // ══════════════════════════════════════════
 function renderFocusList() {
-  const section = document.getElementById('focus-section');
-  const list = document.getElementById('focus-list');
-  
-  if (focusWords.length === 0) {
-    section.classList.remove('visible');
-    return;
-  }
-  
-  section.classList.add('visible');
-  list.innerHTML = focusWords.map(fw =>
-    `<span class="focus-word ${fw.reason === 'near' ? 'near' : ''}">${fw.word}</span>`
+  const sec=document.getElementById('focus-section');
+  if(focusWords.length===0){ sec.classList.remove('visible'); return; }
+  sec.classList.add('visible');
+  document.getElementById('focus-list').innerHTML=focusWords.map(fw=>
+    `<span class="focus-word ${fw.reason==='near'?'near':''}">${fw.word}</span>`
   ).join('');
 }
 
 function downloadFocusCSV() {
-  const header = lang === 'es' 
-    ? 'Palabra,Razón\n'
-    : 'Word,Reason\n';
-  const rows = focusWords.map(fw => 
-    `${fw.word},${fw.reason === 'near' ? (lang === 'es' ? 'Error de acento' : 'Accent error') : (lang === 'es' ? 'Error de ortografía' : 'Spelling error')}`
+  const hdr=lang==='es'?'Palabra,Razón\n':'Word,Reason\n';
+  const rows=focusWords.map(fw=>
+    `${fw.word},${fw.reason==='near'?(lang==='es'?'Error de acento':'Accent error'):(lang==='es'?'Error de ortografía':'Spelling error')}`
   ).join('\n');
-  
-  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'palabras-a-estudiar.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  triggerCSVDownload(hdr+rows,'palabras-a-estudiar.csv');
+}
+
+// ══════════════════════════════════════════
+//  REVIEW PAGE
+// ══════════════════════════════════════════
+function updateReviewBadge() {
+  const count = focusWords.length;
+  const btn=document.getElementById('review-nav-btn');
+  const badge=document.getElementById('review-badge');
+  badge.textContent=count;
+  badge.classList.toggle('hidden', count===0);
+  btn.classList.toggle('has-words', count>0);
+}
+
+function setFilter(f) {
+  currentFilter=f;
+  ['all','wrong','near','mastered'].forEach(id=>{
+    document.getElementById(`ft-${id}`).classList.toggle('active', id===f);
+  });
+  renderReviewTable();
+}
+
+function renderReviewPage() {
+  // Summary numbers
+  const allMastery = Object.values(masteryMap);
+  const totalWrong = allMastery.reduce((a,m)=>a+m.wrong,0);
+  const totalNear  = allMastery.reduce((a,m)=>a+m.nearMiss,0);
+  const totalMastered = allMastery.filter(m=>m.score>=3).length;
+  document.getElementById('rv-total-wrong').textContent=totalWrong;
+  document.getElementById('rv-total-near').textContent=totalNear;
+  document.getElementById('rv-total-mastered').textContent=totalMastered;
+  renderUI();
+  renderReviewTable();
+}
+
+function renderReviewTable() {
+  const body=document.getElementById('word-table-body');
+
+  // Build rows from masteryMap — only words that have been attempted
+  let rows = WORDS
+    .filter(w => masteryMap[w.id] && (masteryMap[w.id].correct+masteryMap[w.id].wrong)>0)
+    .map(w => ({ w, m: masteryMap[w.id] }));
+
+  // Apply filter
+  if (currentFilter==='wrong') rows=rows.filter(r=>r.m.wrong>r.m.nearMiss);
+  else if (currentFilter==='near') rows=rows.filter(r=>r.m.nearMiss>0);
+  else if (currentFilter==='mastered') rows=rows.filter(r=>r.m.score>=3);
+  else rows=rows.filter(r=>r.m.wrong>0||r.m.nearMiss>0); // 'all' = has errors
+
+  // Sort: most total errors first, then alphabetical
+  rows.sort((a,b)=>{
+    const ea=a.m.wrong+a.m.nearMiss, eb=b.m.wrong+b.m.nearMiss;
+    if(eb!==ea) return eb-ea;
+    return a.w.word.localeCompare(b.w.word);
+  });
+
+  if (rows.length===0) {
+    body.innerHTML=`<div class="empty-state"><div class="big-emoji">${currentFilter==='mastered'?'🏆':'🎉'}</div><p>${t('noWordsYet')}</p></div>`;
+    return;
+  }
+
+  const masteryLabels=t('masteryLvl');
+  const masteryClasses=['mastery-0','mastery-1','mastery-2','mastery-3'];
+
+  body.innerHTML=rows.map(({w,m})=>`
+    <div class="word-row">
+      <div class="word-name">${w.word}</div>
+      <div class="word-cell wrong-num">${m.wrong||0}</div>
+      <div class="word-cell near-num">${m.nearMiss||0}</div>
+      <div class="word-cell correct-num">${m.correct||0}</div>
+      <div class="word-cell">
+        <span class="mastery-pill ${masteryClasses[Math.min(3,m.score||0)]}">
+          ${masteryLabels[Math.min(3,m.score||0)]}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function downloadFullCSV() {
+  const rows = WORDS
+    .filter(w=>masteryMap[w.id] && (masteryMap[w.id].correct+masteryMap[w.id].wrong)>0)
+    .map(w=>({ w, m:masteryMap[w.id] }))
+    .sort((a,b)=>(b.m.wrong+b.m.nearMiss)-(a.m.wrong+a.m.nearMiss));
+
+  const hdr = lang==='es'
+    ? 'Palabra,Errores ortografía,Errores acento,Correctas,Estado\n'
+    : 'Word,Spelling Errors,Accent Errors,Correct,Status\n';
+  const masteryLabels=t('masteryLvl');
+  const content=rows.map(({w,m})=>
+    `${w.word},${m.wrong||0},${m.nearMiss||0},${m.correct||0},${masteryLabels[Math.min(3,m.score||0)]}`
+  ).join('\n');
+  triggerCSVDownload(hdr+content,'spelling-bee-review.csv');
+}
+
+function confirmClearHistory() {
+  if (confirm(t('confirmClear'))) {
+    clearStorage();
+    buildPool();
+    renderReviewPage();
+    updateReviewBadge();
+    renderFocusList();
+  }
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function triggerCSVDownload(content, filename) {
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 // ══════════════════════════════════════════
