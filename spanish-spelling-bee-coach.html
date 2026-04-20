@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Spanish Spelling Bee Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --color-bg:#f7f5ef; --color-surface:#fdfbf7; --color-surface-2:#f3efe6; --color-border:#d6d0c5; --color-text:#27241f;
+      --color-muted:#6e6a63; --color-primary:#1f6b63; --color-primary-2:#e0efe9; --color-good:#316b2f; --color-bad:#9b374d;
+      --radius:18px; --shadow:0 14px 34px rgba(46,42,35,.08); --space:16px;
+      --font-body:'Inter',system-ui,sans-serif; --font-display:'Fraunces',serif;
+    }
+    [data-theme="dark"] {
+      --color-bg:#171614; --color-surface:#211f1b; --color-surface-2:#2a2723; --color-border:#3e3a34; --color-text:#f1ece3;
+      --color-muted:#b8b1a4; --color-primary:#77b6aa; --color-primary-2:#213a36; --color-good:#88c081; --color-bad:#e08a9d;
+      --shadow:none;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}
+    body{min-height:100vh}
+    button,input,select{font:inherit}
+    .app{max-width:1150px;margin:0 auto;padding:20px 16px 96px}
+    .skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;background:#fff;padding:8px 12px;z-index:9}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#f2cc4d,#f0e5b5);display:grid;place-items:center;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.06)}
+    .logo svg{width:40px;height:40px}
+    h1{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.4rem);line-height:1;margin:0}
+    .sub{color:var(--color-muted);margin-top:6px;max-width:64ch}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn,.chip{border:none;border-radius:999px;padding:12px 16px;background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border);min-height:44px}
+    .btn.primary{background:var(--color-primary);color:white;border-color:transparent}
+    .btn.ghost{background:transparent}
+    .layout{display:grid;grid-template-columns:1.6fr .95fr;gap:16px}
+    .panel{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .hero{display:grid;gap:14px}
+    .toolbar,.inline{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .modes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .mode-card{padding:14px;border-radius:16px;border:1px solid var(--color-border);background:var(--color-surface-2);cursor:pointer}
+    .mode-card.active{outline:3px solid color-mix(in srgb, var(--color-primary) 35%, transparent);background:var(--color-primary-2)}
+    .prompt{padding:18px;border-radius:18px;background:linear-gradient(180deg,var(--color-surface-2),transparent);border:1px solid var(--color-border)}
+    .prompt h2{margin:0 0 6px;font-size:1.1rem}
+    .word-mask{font-family:var(--font-display);font-size:clamp(2.1rem,7vw,4.8rem);line-height:1.05;letter-spacing:.03em;margin:8px 0 2px}
+    .input-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input[type="text"]{flex:1;min-width:220px;min-height:52px;border-radius:16px;border:1px solid var(--color-border);padding:12px 16px;background:var(--color-surface-2);color:var(--color-text);font-size:1.2rem}
+    .accents{display:flex;gap:8px;flex-wrap:wrap}
+    .accents button{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--color-border);background:var(--color-surface-2)}
+    .feedback{min-height:28px;font-weight:700}
+    .good{color:var(--color-good)} .bad{color:var(--color-bad)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .stat{padding:14px;border-radius:16px;background:var(--color-surface-2);border:1px solid var(--color-border)}
+    .stat .num{font-size:1.6rem;font-weight:800}
+    .small{font-size:.95rem;color:var(--color-muted)}
+    .section-title{font-size:1rem;font-weight:800;margin:0 0 10px}
+    .list{display:grid;gap:10px;max-height:420px;overflow:auto;padding-right:4px}
+    .word-item{display:flex;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:var(--color-surface-2);border:1px solid var(--color-border)}
+    .pill{font-size:.8rem;border-radius:999px;padding:5px 10px;background:var(--color-primary-2);color:var(--color-primary);font-weight:700;white-space:nowrap}
+    details{border:1px solid var(--color-border);border-radius:14px;padding:12px 14px;background:var(--color-surface-2)}
+    summary{cursor:pointer;font-weight:700}
+    .toggles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    label.toggle{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--color-border);border-radius:14px;background:var(--color-surface-2)}
+    .footer-note{margin-top:10px;color:var(--color-muted);font-size:.92rem}
+    .focus-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .hidden{display:none!important}
+    @media (max-width: 920px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.toggles,.modes{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 26c0-8 6-14 13-14s13 6 13 14c0 4-1 7-3 10l7 6-5 5-7-6a18 18 0 0 1-10 3c-10 0-18-8-18-18 0-6 3-11 7-14" stroke="#27241f" stroke-width="4" stroke-linecap="round"/><path d="M30 21l8 6-8 6" stroke="#1f6b63" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <h1 id="appTitle">Spanish Spelling Bee Coach</h1>
+        <p class="sub" id="appSubtitle">Study like a spelling bee, but make it feel like a game.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="langToggle" aria-label="Toggle language">Español</button>
+      <button class="btn ghost" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    </div>
+  </header>
+
+  <main id="main" class="layout">
+    <section class="panel hero">
+      <div class="toolbar">
+        <button class="btn primary" id="startBtn">Start practice</button>
+        <button class="btn" id="speakBtn">🔊 Say word</button>
+        <button class="btn" id="repeatSlowBtn">🐢 Slow repeat</button>
+        <button class="btn" id="nextBtn">Next word</button>
+      </div>
+
+      <div>
+        <p class="section-title" id="modeTitle">Choose mode</p>
+        <div class="modes">
+          <button class="mode-card active" data-mode="practice">
+            <strong data-i18n="practiceMode">Practice mode</strong><br>
+            <span class="small" data-i18n="practiceDesc">See hints and optional supports.</span>
+          </button>
+          <button class="mode-card" data-mode="bee">
+            <strong data-i18n="beeMode">Spelling bee mode</strong><br>
+            <span class="small" data-i18n="beeDesc">Minimal help, like competition style.</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <h2 id="promptLabel">Current challenge</h2>
+        <div class="word-mask" id="wordMask">•••••</div>
+        <p class="small" id="promptHelp">Tap Start Practice, then use Say Word to hear the word aloud.</p>
+      </div>
+
+      <div class="input-row">
+        <input id="answerInput" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Type the word exactly, including accent marks" aria-label="Spelling answer" />
+        <button class="btn primary" id="checkBtn">Check</button>
+      </div>
+
+      <div class="accents" aria-label="Accent shortcuts">
+        <button data-char="á">á</button><button data-char="é">é</button><button data-char="í">í</button><button data-char="ó">ó</button><button data-char="ú">ú</button><button data-char="ü">ü</button><button data-char="ñ">ñ</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div>
+        <p class="section-title" id="optionsTitle">Word help options</p>
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" id="showDefinition" checked><span><strong data-i18n="definition">Definition</strong><br><span class="small" data-i18n="defHelp">Available when provided.</span></span></label>
+          <label class="toggle"><input type="checkbox" id="showExample" checked><span><strong data-i18n="example">Example sentence</strong><br><span class="small" data-i18n="exHelp">Available when provided.</span></span></label>
+          <label class="toggle"><input type="checkbox" id="showPart" checked><span><strong data-i18n="part">Part of speech</strong><br><span class="small" data-i18n="partHelp">Available when provided.</span></span></label>
+          <label class="toggle"><input type="checkbox" id="showHint"><span><strong data-i18n="hint">Show first letter</strong><br><span class="small" data-i18n="hintHelp">Only for practice mode.</span></span></label>
+        </div>
+      </div>
+
+      <details id="clueBox">
+        <summary id="clueSummary">Available clues</summary>
+        <div id="clueContent" class="small"></div>
+      </details>
+    </section>
+
+    <aside class="panel">
+      <div class="stats">
+        <div class="stat"><div class="small" data-i18n="seen">Words seen</div><div class="num" id="seenStat">0</div></div>
+        <div class="stat"><div class="small" data-i18n="correct">Correct</div><div class="num" id="correctStat">0</div></div>
+        <div class="stat"><div class="small" data-i18n="mastered">Mastered</div><div class="num" id="masteredStat">0</div></div>
+        <div class="stat"><div class="small" data-i18n="focus">Focus list</div><div class="num" id="focusStat">0</div></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <p class="section-title" id="focusTitle">Parent focus list</p>
+        <div class="small" id="focusIntro">These are the words that need the most attention based on misses, near misses, and low mastery.</div>
+        <div class="focus-actions">
+          <button class="btn" id="downloadFocus">Download focus list</button>
+          <button class="btn" id="resetProgress">Reset progress</button>
+        </div>
+        <div class="list" id="focusList" style="margin-top:12px"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <p class="section-title" id="recentTitle">Recent results</p>
+        <div class="list" id="recentList"></div>
+      </div>
+
+      <p class="footer-note" id="footerNote">Progress saves only in this browser tab for now. A downloadable parent focus list is always available.</p>
+    </aside>
+  </main>
+</div>
+<script src="./words.js"></script>
+<script>
+const state = {
+  lang: 'en',
+  mode: 'practice',
+  theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+  started: false,
+  current: null,
+  words: (window.SPELLING_WORDS || []).map(w => ({...w, seen:0, correct:0, wrong:0, streak:0, mastery:0, nearMiss:0})),
+  recent: []
+};
+document.documentElement.setAttribute('data-theme', state.theme);
+
+const t = {
+  en: {
+    title:'Spanish Spelling Bee Coach', subtitle:'Study like a spelling bee, but make it feel like a game.', start:'Start practice', say:'Say word', slow:'Slow repeat', next:'Next word', choose:'Choose mode', current:'Current challenge', help:'Tap Start Practice, then use Say Word to hear the word aloud.', input:'Type the word exactly, including accent marks', check:'Check', clues:'Available clues', noClues:'No optional clues are available for this word yet.', definition:'Definition', example:'Example sentence', part:'Part of speech', defHelp:'Available when provided.', exHelp:'Available when provided.', partHelp:'Available when provided.', hint:'Show first letter', hintHelp:'Only for practice mode.', practiceMode:'Practice mode', practiceDesc:'See hints and optional supports.', beeMode:'Spelling bee mode', beeDesc:'Minimal help, like competition style.', seen:'Words seen', correct:'Correct', mastered:'Mastered', focus:'Focus list', focusTitle:'Parent focus list', focusIntro:'These are the words that need the most attention based on misses, near misses, and low mastery.', download:'Download focus list', reset:'Reset progress', recent:'Recent results', footer:'Progress saves only in this browser tab for now. A downloadable parent focus list is always available.', good:'Correct!', wrong:'Not yet. The correct spelling is: ', startAudio:'Audio unlocked. Press Say Word any time.', noWord:'No word selected yet.', downloaded:'Focus list downloaded.'
+  },
+  es: {
+    title:'Entrenador de Deletreo en Español', subtitle:'Practica como en un concurso de deletreo, pero con formato de juego.', start:'Comenzar práctica', say:'Decir palabra', slow:'Repetir despacio', next:'Siguiente palabra', choose:'Elegir modo', current:'Reto actual', help:'Toca Comenzar práctica y luego usa Decir palabra para escuchar la palabra.', input:'Escribe la palabra exactamente, con acentos', check:'Revisar', clues:'Pistas disponibles', noClues:'Todavía no hay pistas opcionales para esta palabra.', definition:'Definición', example:'Oración de ejemplo', part:'Categoría gramatical', defHelp:'Disponible cuando se agregue.', exHelp:'Disponible cuando se agregue.', partHelp:'Disponible cuando se agregue.', hint:'Mostrar primera letra', hintHelp:'Solo en modo práctica.', practiceMode:'Modo práctica', practiceDesc:'Muestra apoyos y pistas opcionales.', beeMode:'Modo concurso', beeDesc:'Ayuda mínima, como en la competencia.', seen:'Palabras vistas', correct:'Correctas', mastered:'Dominadas', focus:'Lista clave', focusTitle:'Lista para padres', focusIntro:'Estas son las palabras que necesitan más atención según errores, casi aciertos y dominio bajo.', download:'Descargar lista', reset:'Reiniciar progreso', recent:'Resultados recientes', footer:'El progreso se guarda solo en esta pestaña del navegador por ahora. Siempre puedes descargar la lista para padres.', good:'¡Correcto!', wrong:'Todavía no. La palabra correcta es: ', startAudio:'Audio activado. Presiona Decir palabra cuando quieras.', noWord:'Todavía no hay palabra seleccionada.', downloaded:'Lista descargada.'
+  }
+};
+const el = id => document.getElementById(id);
+const answerInput = el('answerInput');
+
+function applyLanguage(){
+  const l=t[state.lang];
+  el('appTitle').textContent=l.title; el('appSubtitle').textContent=l.subtitle; el('startBtn').textContent=l.start; el('speakBtn').textContent='🔊 '+l.say; el('repeatSlowBtn').textContent='🐢 '+l.slow; el('nextBtn').textContent=l.next; el('modeTitle').textContent=l.choose; el('promptLabel').textContent=l.current; el('promptHelp').textContent=state.started ? l.startAudio : l.help; answerInput.placeholder=l.input; el('checkBtn').textContent=l.check; el('clueSummary').textContent=l.clues; el('optionsTitle').textContent=state.lang==='en'?'Word help options':'Opciones de ayuda'; el('focusTitle').textContent=l.focusTitle; el('focusIntro').textContent=l.focusIntro; el('downloadFocus').textContent=l.download; el('resetProgress').textContent=l.reset; el('recentTitle').textContent=l.recent; el('footerNote').textContent=l.footer; document.querySelectorAll('[data-i18n]').forEach(node=>{const key=node.dataset.i18n; if(l[key]) node.textContent=l[key];}); el('langToggle').textContent=state.lang==='en'?'Español':'English'; updateClues(); renderStats(); renderRecent(); renderFocus();
+}
+
+function stripMarks(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
+function chooseWord(){
+  const pool = state.words.map(w => {
+    const penalty = (w.wrong*3) + (w.nearMiss*2) + Math.max(0, 4-w.mastery) + (w.seen===0 ? 2 : 0) - Math.min(4, w.streak);
+    return {w, score: Math.max(1, penalty)};
+  });
+  const total = pool.reduce((a,b)=>a+b.score,0);
+  let r = Math.random()*total;
+  for (const item of pool){ r -= item.score; if (r <= 0) return item.w; }
+  return pool[0].w;
+}
+function maskWord(w){ return state.mode==='bee' ? '• '.repeat(Math.max(w.word.length,5)).trim() : '•'.repeat(Math.max(w.word.length,5)); }
+function setCurrent(word){ state.current=word; answerInput.value=''; el('feedback').textContent=''; el('feedback').className='feedback'; el('wordMask').textContent=maskWord(word); updateClues(); }
+function speak(text, slow=false){
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='es-ES'; u.rate=slow?0.68:0.9; u.pitch=1;
+  const voices = speechSynthesis.getVoices();
+  const spanish = voices.find(v => /^es/i.test(v.lang)); if (spanish) u.voice = spanish;
+  speechSynthesis.speak(u);
+}
+function buildPrompt(word){ return state.mode==='bee' ? word.word : `${word.word}.`; }
+function updateClues(){
+  const l=t[state.lang];
+  if(!state.current){ el('clueContent').innerHTML='<p>'+l.noClues+'</p>'; return; }
+  const parts=[];
+  if(state.mode==='practice' && el('showHint').checked) parts.push(`<p><strong>${state.lang==='en'?'First letter':'Primera letra'}:</strong> ${state.current.word.charAt(0)}</p>`);
+  if(el('showDefinition').checked && state.current.definition) parts.push(`<p><strong>${l.definition}:</strong> ${state.current.definition}</p>`);
+  if(el('showExample').checked && state.current.example) parts.push(`<p><strong>${l.example}:</strong> ${state.current.example}</p>`);
+  if(el('showPart').checked && state.current.partOfSpeech) parts.push(`<p><strong>${l.part}:</strong> ${state.current.partOfSpeech}</p>`);
+  el('clueContent').innerHTML=parts.length?parts.join(''):`<p>${l.noClues}</p>`;
+}
+function scoreWord(word, ok, near){ word.seen++; if(ok){ word.correct++; word.streak++; word.mastery=Math.min(6, word.mastery+2); } else { word.wrong++; word.streak=0; word.mastery=Math.max(0, word.mastery-1); if(near) word.nearMiss++; } }
+function renderStats(){
+  el('seenStat').textContent = state.words.filter(w=>w.seen>0).length;
+  el('correctStat').textContent = state.words.reduce((a,w)=>a+w.correct,0);
+  el('masteredStat').textContent = state.words.filter(w=>w.mastery>=5).length;
+  el('focusStat').textContent = focusWords().length;
+}
+function renderRecent(){
+  const box=el('recentList'); box.innerHTML='';
+  state.recent.slice(0,12).forEach(item=>{
+    const div=document.createElement('div'); div.className='word-item';
+    div.innerHTML=`<div><strong>${item.word}</strong><div class="small">${item.result}</div></div><span class="pill">${item.mode}</span>`;
+    box.appendChild(div);
+  });
+}
+function focusWords(){
+  return [...state.words].sort((a,b)=>((b.wrong*3+b.nearMiss*2-b.mastery)-(a.wrong*3+a.nearMiss*2-a.mastery))).filter(w=>w.seen>0 && (w.wrong>0 || w.mastery<3)).slice(0,30);
+}
+function renderFocus(){
+  const box=el('focusList'); box.innerHTML='';
+  const list=focusWords();
+  if(!list.length){ const div=document.createElement('div'); div.className='word-item'; div.innerHTML=`<div><strong>${state.lang==='en'?'No focus words yet':'Todavía no hay palabras clave'}</strong><div class="small">${state.lang==='en'?'Miss a few words or keep practicing to build the list.':'Practiquen un poco más para generar la lista.'}</div></div>`; box.appendChild(div); return; }
+  list.forEach(w=>{ const div=document.createElement('div'); div.className='word-item'; div.innerHTML=`<div><strong>${w.word}</strong><div class="small">${state.lang==='en'?'Wrong'}: ${w.wrong} · ${state.lang==='en'?'Near misses':'Casi'}: ${w.nearMiss} · ${state.lang==='en'?'Mastery':'Dominio'}: ${w.mastery}/6</div></div><span class="pill">${state.lang==='en'?'Focus':'Clave'}</span>`; box.appendChild(div); });
+}
+function checkAnswer(){
+  if(!state.current) return;
+  const answer=answerInput.value.trim();
+  const exact = answer === state.current.word;
+  const near = !exact && stripMarks(answer) === stripMarks(state.current.word);
+  scoreWord(state.current, exact, near);
+  const l=t[state.lang];
+  if(exact){ el('feedback').textContent=l.good; el('feedback').className='feedback good'; }
+  else { el('feedback').textContent=l.wrong + state.current.word + (near ? (state.lang==='en'?' (You missed an accent mark or special character.)':' (Faltó un acento o carácter especial.)') : ''); el('feedback').className='feedback bad'; }
+  state.recent.unshift({word: state.current.word, result: exact ? (state.lang==='en'?'Correct':'Correcto') : (near ? (state.lang==='en'?'Near miss':'Casi acierto') : (state.lang==='en'?'Incorrect':'Incorrecto')), mode: state.mode==='practice' ? (state.lang==='en'?'Practice':'Práctica') : (state.lang==='en'?'Bee':'Concurso')});
+  renderStats(); renderRecent(); renderFocus(); setTimeout(()=>setCurrent(chooseWord()), 900);
+}
+function downloadFocus(){
+  const list=focusWords();
+  const rows=[['word','wrong','near_miss','mastery','seen']].concat(list.map(w=>[w.word,w.wrong,w.nearMiss,w.mastery,w.seen]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('
+');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='spanish-spelling-focus-list.csv'; a.click();
+  alert(t[state.lang].downloaded);
+}
+
+document.querySelectorAll('.mode-card').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('.mode-card').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); state.mode=btn.dataset.mode; if(state.current) setCurrent(state.current); }));
+el('startBtn').addEventListener('click',()=>{ state.started=true; if(!state.current) setCurrent(chooseWord()); speak('Hola'); el('promptHelp').textContent=t[state.lang].startAudio; });
+el('speakBtn').addEventListener('click',()=> state.current ? speak(buildPrompt(state.current), false) : alert(t[state.lang].noWord));
+el('repeatSlowBtn').addEventListener('click',()=> state.current ? speak(buildPrompt(state.current), true) : alert(t[state.lang].noWord));
+el('nextBtn').addEventListener('click',()=> setCurrent(chooseWord()));
+el('checkBtn').addEventListener('click', checkAnswer);
+answerInput.addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
+document.querySelectorAll('.accents button').forEach(b=>b.addEventListener('click',()=>{ const start=answerInput.selectionStart ?? answerInput.value.length; const end=answerInput.selectionEnd ?? answerInput.value.length; const ch=b.dataset.char; answerInput.value=answerInput.value.slice(0,start)+ch+answerInput.value.slice(end); answerInput.focus(); answerInput.setSelectionRange(start+1,start+1); }));
+['showDefinition','showExample','showPart','showHint'].forEach(id=>el(id).addEventListener('change',updateClues));
+el('downloadFocus').addEventListener('click',downloadFocus);
+el('resetProgress').addEventListener('click',()=>{ state.words=state.words.map(w=>({...w,seen:0,correct:0,wrong:0,streak:0,mastery:0,nearMiss:0})); state.recent=[]; renderStats(); renderRecent(); renderFocus(); el('feedback').textContent=''; });
+el('langToggle').addEventListener('click',()=>{ state.lang = state.lang==='en'?'es':'en'; applyLanguage(); });
+el('themeToggle').addEventListener('click',()=>{ state.theme = state.theme==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', state.theme); el('themeToggle').textContent = state.theme==='dark'?'☀️':'🌙'; });
+applyLanguage(); setCurrent(chooseWord());
+  </script>
+</body>
+</html>
