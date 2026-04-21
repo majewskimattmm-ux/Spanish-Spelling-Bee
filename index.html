@@ -229,6 +229,47 @@
 
   .hidden { display: none !important; }
 
+  /* ── Speed Control ── */
+  .speed-control {
+    margin: 14px auto 0;
+    max-width: 320px;
+    text-align: center;
+  }
+  .speed-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .speed-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .speed-btn {
+    flex: 1;
+    max-width: 100px;
+    padding: 8px 10px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-300);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .speed-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .speed-btn.rate-active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+    font-weight: 700;
+  }
+
   /* ── Letter Guide Panel ── */
   .letter-guide-panel {
     background: #fffbeb;
@@ -393,7 +434,18 @@
       <span id="start-btn-lbl">🐝 Comenzar</span>
     </button>
     <div class="word-count-badge" id="word-count-badge">1,312 palabras · adaptivo</div>
-    <div style="margin-top:14px;text-align:center;">
+
+    <!-- Voice speed control -->
+    <div class="speed-control" id="speed-control">
+      <span class="speed-label" id="speed-lbl">🔊 Velocidad de voz / Voice Speed</span>
+      <div class="speed-btns">
+        <button class="speed-btn rate-active" id="rate-normal" onclick="setSpeechRate(0.78)">Normal</button>
+        <button class="speed-btn" id="rate-slow" onclick="setSpeechRate(0.58)">Lento</button>
+        <button class="speed-btn" id="rate-vslow" onclick="setSpeechRate(0.42)">Muy lento</button>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;text-align:center;">
       <button class="guide-toggle-btn" onclick="toggleLetterGuide('start-letter-guide')">
         📖 <span id="guide-btn-lbl">Guía de letras / Letter Guide</span>
       </button>
@@ -457,6 +509,13 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
             <span id="next-btn-lbl">Siguiente</span>
           </button>
+        </div>
+        <!-- In-game speed control (compact) -->
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;margin-bottom:2px;">
+          <span style="font-size:11px;color:var(--gray-400);align-self:center;margin-right:2px;">🔊</span>
+          <button class="speed-btn" id="rate-normal" onclick="setSpeechRate(0.78)" style="padding:5px 10px;font-size:11px;">Normal</button>
+          <button class="speed-btn" id="rate-slow" onclick="setSpeechRate(0.58)" style="padding:5px 10px;font-size:11px;">Lento</button>
+          <button class="speed-btn" id="rate-vslow" onclick="setSpeechRate(0.42)" style="padding:5px 10px;font-size:11px;">Muy lento</button>
         </div>
         <div class="clue-section" id="clue-section">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -2082,6 +2141,8 @@ function init() {
   buildPool();
   loadVoices();
   window.speechSynthesis.onvoiceschanged = loadVoices;
+  // Apply saved speed preference to buttons
+  setSpeechRate(speechRate);
   renderUI();
   updateReviewBadge();
   showSavedBanner();
@@ -2190,9 +2251,42 @@ function loadVoices() { voices = window.speechSynthesis.getVoices(); }
 
 function getSpanishVoice() {
   const all = window.speechSynthesis.getVoices();
-  return all.find(v=>v.lang==='es-US') || all.find(v=>v.lang==='es-MX') ||
-         all.find(v=>v.lang==='es-419') || all.find(v=>v.lang==='es-ES') ||
-         all.find(v=>v.lang.startsWith('es')) || null;
+  if (!all.length) return null;
+
+  // Priority 1: Named high-quality voices (iOS Paulina = best Latin American,
+  //   Jorge/Monica = Spain, Google Español voices on Android/Chrome)
+  const preferred = ['Paulina','Monica','Mónica','Jorge','Diego',
+                     'Google español de Estados Unidos','Google español',
+                     'Microsoft Sabina','Microsoft Raquel'];
+  for (const name of preferred) {
+    const v = all.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
+    if (v) return v;
+  }
+
+  // Priority 2: Enhanced/premium (non-compact) es-MX or es-US
+  const enhanced = all.find(v => (v.lang==='es-MX'||v.lang==='es-US') && !v.name.toLowerCase().includes('compact'));
+  if (enhanced) return enhanced;
+
+  // Priority 3: Any enhanced Spanish voice
+  const anyEnhanced = all.find(v => v.lang.startsWith('es') && !v.name.toLowerCase().includes('compact'));
+  if (anyEnhanced) return anyEnhanced;
+
+  // Priority 4: Any Spanish voice at all
+  return all.find(v=>v.lang==='es-MX') || all.find(v=>v.lang==='es-US') ||
+         all.find(v=>v.lang==='es-ES') || all.find(v=>v.lang.startsWith('es')) || null;
+}
+
+// speechRate: persisted speed preference (normal=0.78, slow=0.58, verySlow=0.42)
+let speechRate = 0.78;
+try { const s=_LS.getItem('spelling_speech_rate'); if(s) speechRate=parseFloat(s); } catch(e){}
+
+function setSpeechRate(rate) {
+  speechRate = rate;
+  try { _LS.setItem('spelling_speech_rate', rate); } catch(e){}
+  // update ALL speed buttons (may appear on home screen and in-game)
+  document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('rate-active'));
+  const activeClass = rate<=0.44?'rate-vslow': rate<=0.6?'rate-slow':'rate-normal';
+  document.querySelectorAll('#'+activeClass).forEach(btn => btn.classList.add('rate-active'));
 }
 
 function speakWordSlow() { speakWord(true); }
@@ -2200,6 +2294,7 @@ function speakWordSlow() { speakWord(true); }
 function speakWord(slow=false) {
   if (!currentWord) return;
   try { window.speechSynthesis.cancel(); } catch(e) {}
+  const rate = slow ? Math.min(speechRate, 0.55) : speechRate;
   const phrases = mode==='bee'
     ? [`La palabra es: ${currentWord.word}`, currentWord.word]
     : [currentWord.word];
@@ -2216,7 +2311,7 @@ function speakWord(slow=false) {
     const utt=new SpeechSynthesisUtterance(phrases[idx++]);
     const voice=getSpanishVoice();
     if(voice) utt.voice=voice;
-    utt.lang='es-US'; utt.rate=slow?0.6:0.85; utt.pitch=1.0; utt.volume=1.0;
+    utt.lang='es-MX'; utt.rate=rate; utt.pitch=1.0; utt.volume=1.0;
     utt.onend=speakNext; utt.onerror=speakNext;
     setTimeout(()=>{ try{window.speechSynthesis.speak(utt);}catch(e){} }, idx===1?0:400);
   };
@@ -2428,7 +2523,7 @@ function speakCorrectAfterDelay(word) {
   setTimeout(()=>{
     const utt=new SpeechSynthesisUtterance(word);
     const v=getSpanishVoice(); if(v) utt.voice=v;
-    utt.lang='es-US'; utt.rate=0.8;
+    utt.lang='es-MX'; utt.rate=speechRate;
     window.speechSynthesis.speak(utt);
   }, 600);
 }
